@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import Header from './components/Header'
 import HomeScreen from './screens/HomeScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import LecturesScreen from './screens/LecturesScreen'
@@ -8,23 +9,28 @@ import TestsScreen from './screens/TestsScreen'
 type Screen = 'home' | 'profile' | 'lectures' | 'tests'
 
 function App() {
-  const [activeScreen, setActiveScreen] = useState<Screen>('home')
+  const [screen, setScreen] = useState<Screen>('home')
 
   return (
-    <div style={{ padding: 16 }}>
-      {/* Временная навигация (потом заменим на красивую) */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={() => setActiveScreen('home')}>Home</button>
-        <button onClick={() => setActiveScreen('profile')}>Profile</button>
-        <button onClick={() => setActiveScreen('lectures')}>Lectures</button>
-        <button onClick={() => setActiveScreen('tests')}>Tests</button>
-      </div>
+    <div>
+      <Header
+        onHome={() => setScreen('home')}
+        onProfile={() => setScreen('profile')}
+        title={screen === 'home' ? 'Главная' : screen === 'profile' ? 'Профиль' : screen === 'lectures' ? 'Лекции' : 'Тесты'}
+      />
 
-      {/* Рендерим один экран в зависимости от состояния */}
-      {activeScreen === 'home' && <HomeScreen />}
-      {activeScreen === 'profile' && <ProfileScreen />}
-      {activeScreen === 'lectures' && <LecturesScreen />}
-      {activeScreen === 'tests' && <TestsScreen />}
+      <div style={{ padding: 16 }}>
+        {screen === 'home' && (
+          <HomeScreen
+            onGoLectures={() => setScreen('lectures')}
+            onGoTests={() => setScreen('tests')}
+          />
+        )}
+
+        {screen === 'profile' && <ProfileScreen />}
+        {screen === 'lectures' && <LecturesScreen />}
+        {screen === 'tests' && <TestsScreen />}
+      </div>
     </div>
   )
 }
