@@ -1,9 +1,11 @@
 type HomeScreenProps = {
   onGoLectures: () => void
   onGoTests: () => void
+  onGoPlaceObservation: () => void
 }
 
-function HomeScreen({ onGoLectures, onGoTests }: HomeScreenProps) {
+
+function HomeScreen({ onGoLectures, onGoTests, onGoPlaceObservation }: HomeScreenProps) {
 return (
   <div>
     <h1>Hygiene Level Up</h1>
@@ -53,6 +55,7 @@ return (
     <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
       <button onClick={onGoLectures}>Открыть лекции</button>
       <button onClick={onGoTests}>Открыть тесты</button>
+      <button onClick={onGoPlaceObservation}>Наблюдение места</button>
     </div>
 
     {/* Главный CTA */}
