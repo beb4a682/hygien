@@ -6,8 +6,11 @@ import ProfileScreen from './screens/ProfileScreen'
 import LecturesScreen from './screens/LecturesScreen'
 import TestsScreen from './screens/TestsScreen'
 import LectureViewScreen from './screens/LectureViewScreen'
+import LectureDoneScreen from './screens/LectureDoneScreen'
 
-type Screen = 'home' | 'profile' | 'lectures' | 'tests' | 'lectureView'
+
+type Screen = 'home' | 'profile' | 'lectures' | 'tests' | 'lectureView' | 'lectureDone'
+
 
 type LectureStatus = 'locked' | 'available' | 'done'
 type Lecture = {
@@ -115,8 +118,21 @@ function App() {
             title={selectedLecture.title}
             text={LECTURE_TEXT[selectedLecture.id] ?? 'Текст пока не добавлен.'}
             onBack={() => setScreen('lectures')}
+            onDone={() => setScreen('lectureDone')}
           />
         )}
+
+        {screen === 'lectureDone' && selectedLecture && (
+          <LectureDoneScreen
+            title={selectedLecture.title}
+            onGoHome={() => {
+              setScreen('home')
+              setSelectedLectureId(null)
+            }}
+            onBackToLectures={() => setScreen('lectures')}
+          />
+        )}
+
 
         {screen === 'tests' && <TestsScreen />}
       </div>
