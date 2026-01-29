@@ -2,24 +2,31 @@ type LectureDoneScreenProps = {
   title: string
   onGoHome: () => void
   onBackToLectures: () => void
+  onGoTest: () => void
 }
 
-function LectureDoneScreen({ title, onGoHome, onBackToLectures }: LectureDoneScreenProps) {
+function LectureDoneScreen({
+  title,
+  onGoHome,
+  onBackToLectures,
+  onGoTest,
+}: LectureDoneScreenProps) {
   return (
     <div>
-      <h1>Отлично! ✅</h1>
+      <h1>Готово ✅</h1>
 
-      <p style={{ marginTop: 8 }}>
-        Ты прошёл лекцию: <strong>{title}</strong>
+      <p style={{ marginTop: 8, opacity: 0.9 }}>
+        Ты закончил лекцию: <strong>{title}</strong>
       </p>
 
-      <p style={{ marginTop: 12, opacity: 0.9 }}>
-        🐷 «Красавчик! Главное — не геройствовать, а делать маленькие шаги каждый день».
+      <p style={{ marginTop: 8, opacity: 0.85 }}>
+        Можно закрепить знания — пройти мини-тест по этой теме.
       </p>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-        <button onClick={onGoHome}>На главную</button>
+      <div style={{ display: 'grid', gap: 8, marginTop: 16 }}>
+        <button onClick={onGoTest}>Проверить себя</button>
         <button onClick={onBackToLectures}>К списку лекций</button>
+        <button onClick={onGoHome}>На главную</button>
       </div>
     </div>
   )

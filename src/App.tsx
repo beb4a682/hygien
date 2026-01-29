@@ -5,12 +5,14 @@ import HomeScreen from './screens/HomeScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import LecturesScreen from './screens/LecturesScreen'
 import TestsScreen from './screens/TestsScreen'
-import TestResultScreen from './screens/TestResultScreen.tsx'
+import TestResultScreen from './screens/TestResultScreen'
 import LectureViewScreen from './screens/LectureViewScreen'
 import LectureDoneScreen from './screens/LectureDoneScreen'
 import PlacePickScreen from './screens/PlacePickScreen'
 import PlaceObservationScreen from './screens/PlaceObservationScreen'
 import PlaceResultScreen from './screens/PlaceResultScreen'
+import LectureCardsScreen from './screens/LectureCardsScreen'
+import { LECTURE_CARDS } from './data/lectureCards'
 import { LECTURES } from './data/lectures'
 import { LECTURE_TEXT } from './data/lectureText'
 import { PLACES } from './data/places'
@@ -29,8 +31,10 @@ type Screen =
   | 'placeObservation'
   | 'placeResult'
 function App() {
+  const [activeTestId, setActiveTestId] = useState<string>('hands-test')
   const [screen, setScreen] = useState<Screen>('home')
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null)
+  const [dailyMission, setDailyMission] = useState<string | null>(null)
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null)
   const [placeScore, setPlaceScore] = useState<{ score: number; max: number } | null>(null)
   const [testScore, setTestScore] = useState<{ score: number; max: number } | null>(null)
@@ -65,17 +69,27 @@ function App() {
       />
 
       <div style={{ padding: 16 }}>
-        {screen === 'home' && (
-          <HomeScreen
-            onGoLectures={() => setScreen('lectures')}
-            onGoTests={() => {
-              setTestScore(null)
-              setScreen('tests')
-            }}
-            onGoPlaceObservation={() => setScreen('placePick')}
-          />
+       {screen === 'home' && (
+        <HomeScreen
+          onGoLectures={() => setScreen('lectures')}
+          onGoTests={() => {
+            setTestScore(null)
+            setActiveTestId('hands-test')
+            setScreen('tests')
+          }}
 
-        )}
+          onGoPlaceObservation={() => setScreen('placePick')}
+          missionText={dailyMission}
+          onAcceptMission={() => {
+            // пока просто подтверждение, позже дадим XP/галочку
+            // можно добавить alert или тост, но пока оставим пустым
+          }}
+          onPostponeMission={() => {
+            // можно оставить миссию, просто закрыть действие
+          }}
+        />
+      )}
+
 
         {screen === 'profile' && <ProfileScreen />}
 
@@ -90,13 +104,18 @@ function App() {
         )}
 
         {screen === 'lectureView' && selectedLecture && (
-          <LectureViewScreen
+          <LectureCardsScreen
             title={selectedLecture.title}
-            text={LECTURE_TEXT[selectedLecture.id] ?? 'Текст пока не добавлен.'}
+            cards={LECTURE_CARDS[selectedLecture.id] ?? []}
             onBack={() => setScreen('lectures')}
-            onDone={() => setScreen('lectureDone')}
+            onDone={() => {
+              setDailyMission(selectedLecture.mission)
+              setScreen('lectureDone')
+            }}
+
           />
         )}
+
 
         {screen === 'lectureDone' && selectedLecture && (
           <LectureDoneScreen
@@ -106,17 +125,26 @@ function App() {
               setSelectedLectureId(null)
             }}
             onBackToLectures={() => setScreen('lectures')}
+            onGoTest={() => {
+              setTestScore(null)
+              setActiveTestId(selectedLecture.testId)
+              setScreen('tests')
+            }}
           />
         )}
 
+
         {screen === 'tests' && (
           <TestsScreen
+            testId={activeTestId}
             onSubmit={(score, maxScore) => {
               setTestScore({ score, max: maxScore })
               setScreen('testResult')
             }}
           />
         )}
+
+
         {screen === 'testResult' && testScore && (
           <TestResultScreen
             score={testScore.score}
