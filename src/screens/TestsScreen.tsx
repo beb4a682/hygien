@@ -1,105 +1,141 @@
-import { useState } from 'react'
-
-type Answer = {
-  id: string
-  text: string
-  isCorrect: boolean
-}
-
-type Question = {
-  id: string
-  text: string
-  answers: Answer[]
-}
+import { useMemo, useState } from 'react'
+import { TESTS } from '../data/tests'
 
 type TestsScreenProps = {
+  testId: string
   onSubmit: (score: number, maxScore: number) => void
 }
 
-const QUESTIONS: Question[] = [
-  {
-    id: 'q1',
-    text: 'Когда нужно мыть руки?',
-    answers: [
-      { id: 'a1', text: 'Перед едой', isCorrect: true },
-      { id: 'a2', text: 'Только если они грязные', isCorrect: false },
-      { id: 'a3', text: 'Раз в день', isCorrect: false },
-    ],
-  },
-  {
-    id: 'q2',
-    text: 'Сколько секунд нужно мыть руки?',
-    answers: [
-      { id: 'a1', text: '5 секунд', isCorrect: false },
-      { id: 'a2', text: '20 секунд', isCorrect: true },
-      { id: 'a3', text: '1 минуту', isCorrect: false },
-    ],
-  },
-  {
-    id: 'q3',
-    text: 'Что нужно делать при мытье рук?',
-    answers: [
-      { id: 'a1', text: 'Тереть только ладони', isCorrect: false },
-      { id: 'a2', text: 'Тереть между пальцами', isCorrect: true },
-      { id: 'a3', text: 'Просто намочить водой', isCorrect: false },
-    ],
-  },
-]
+function TestsScreen({ testId, onSubmit }: TestsScreenProps) {
+  const test = TESTS[testId]
+  const questions = test?.questions ?? []
 
-function TestsScreen({ onSubmit }: TestsScreenProps) {
+  // индекс текущего вопроса
+  const [step, setStep] = useState(0)
+
+  // выбранные ответы { questionId: answerId }
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
+
+  const current = questions[step]
+
+  const selectedForCurrent = current ? selectedAnswers[current.id] : undefined
+  const canGoNext = Boolean(selectedForCurrent)
+
+  const progressLabel = useMemo(() => {
+    if (!questions.length) return ''
+    return `Вопрос ${step + 1} из ${questions.length}`
+  }, [questions.length, step])
 
   const handleSelect = (questionId: string, answerId: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: answerId }))
   }
 
-  const handleSubmit = () => {
-    const correctCount = QUESTIONS.reduce((total, question) => {
-      const selectedAnswerId = selectedAnswers[question.id]
-      const selectedAnswer = question.answers.find((answer) => answer.id === selectedAnswerId)
-      return total + (selectedAnswer?.isCorrect ? 1 : 0)
+  const computeScore = () => {
+    return questions.reduce((total, q) => {
+      const pickedId = selectedAnswers[q.id]
+      const picked = q.answers.find((a) => a.id === pickedId)
+      return total + (picked?.isCorrect ? 1 : 0)
     }, 0)
-
-    onSubmit(correctCount, QUESTIONS.length)
   }
-  const allAnswered = QUESTIONS.every((q) => Boolean(selectedAnswers[q.id]))
+
+  const onNext = () => {
+    if (!current) return
+    if (step < questions.length - 1) {
+      setStep((s) => s + 1)
+      return
+    }
+    const score = computeScore()
+    onSubmit(score, questions.length)
+  }
+
+  const onPrev = () => {
+    setStep((s) => Math.max(0, s - 1))
+  }
+
+  if (!test) return <p>Тест не найден</p>
+  if (!questions.length) return <p>В этом тесте пока нет вопросов</p>
+  if (!current) return <p>Ошибка: вопрос не найден</p>
+
+  const isLast = step === questions.length - 1
 
   return (
     <div>
-      <h1>Мини-тест</h1>
-      <p>Ответь на вопросы, чтобы проверить себя.</p>
+      <h1>{test.title}</h1>
+      <p style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>{progressLabel}</p>
 
-      {QUESTIONS.map((q) => (
-        <div key={q.id} style={{ marginTop: 16 }}>
-          <strong>{q.text}</strong>
+      {/* Прогресс-бар */}
+      <div
+        style={{
+          background: '#eee',
+          height: 10,
+          borderRadius: 999,
+          overflow: 'hidden',
+          marginTop: 10,
+        }}
+      >
+        <div
+          style={{
+            width: `${Math.round(((step + 1) / questions.length) * 100)}%`,
+            height: '100%',
+            background: '#999',
+            transition: 'width 220ms ease',
+          }}
+        />
+      </div>
 
-          <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
-            {q.answers.map((a) => (
-              <label key={a.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input
-                  type="radio"
-                  name={q.id}
-                  checked={selectedAnswers[q.id] === a.id}
-                  onChange={() => handleSelect(q.id, a.id)}
-                />
-                {a.text}
-              </label>
-            ))}
-          </div>
+      {/* Карточка вопроса */}
+      <div
+        style={{
+          marginTop: 14,
+          padding: 16,
+          borderRadius: 16,
+          background: '#f5f5f5',
+        }}
+      >
+        <div style={{ fontWeight: 800, fontSize: 18 }}>{current.text}</div>
+
+        <div style={{ marginTop: 12, display: 'grid', gap: 8 }}>
+          {current.answers.map((a) => (
+            <label
+              key={a.id}
+              style={{
+                display: 'flex',
+                gap: 10,
+                alignItems: 'center',
+                padding: 10,
+                borderRadius: 12,
+                background: selectedForCurrent === a.id ? '#e9e9e9' : '#fff',
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="radio"
+                name={current.id}
+                checked={selectedForCurrent === a.id}
+                onChange={() => handleSelect(current.id, a.id)}
+              />
+              <span>{a.text}</span>
+            </label>
+          ))}
         </div>
-      ))}
 
-      <div style={{ marginTop: 24 }}>
-        <button onClick={handleSubmit} disabled={!allAnswered}>
-  Проверить
-</button>
+        {/* Подсказка если не выбрал */}
+        {!canGoNext && (
+          <div style={{ marginTop: 10, fontSize: 12, opacity: 0.8 }}>
+            Выбери вариант ответа, чтобы продолжить.
+          </div>
+        )}
+      </div>
 
-{!allAnswered && (
-  <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
-    Ответь на все вопросы, чтобы получить результат.
-  </div>
-)}
+      {/* Навигация */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
+        <button onClick={onPrev} disabled={step === 0}>
+          ← Назад
+        </button>
 
+        <button onClick={onNext} disabled={!canGoNext}>
+          {isLast ? 'Проверить' : 'Дальше →'}
+        </button>
       </div>
     </div>
   )
