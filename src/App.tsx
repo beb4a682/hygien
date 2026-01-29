@@ -5,6 +5,7 @@ import HomeScreen from './screens/HomeScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import LecturesScreen from './screens/LecturesScreen'
 import TestsScreen from './screens/TestsScreen'
+import TestResultScreen from './screens/TestResultScreen.tsx'
 import LectureViewScreen from './screens/LectureViewScreen'
 import LectureDoneScreen from './screens/LectureDoneScreen'
 import PlacePickScreen from './screens/PlacePickScreen'
@@ -21,6 +22,7 @@ type Screen =
   | 'profile'
   | 'lectures'
   | 'tests'
+  | 'testResult'
   | 'lectureView'
   | 'lectureDone'
   | 'placePick'
@@ -31,7 +33,7 @@ function App() {
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null)
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null)
   const [placeScore, setPlaceScore] = useState<{ score: number; max: number } | null>(null)
-
+  const [testScore, setTestScore] = useState<{ score: number; max: number } | null>(null)
   const selectedLecture = useMemo(() => {
     if (!selectedLectureId) return null
     return LECTURES.find((l) => l.id === selectedLectureId) ?? null
@@ -44,7 +46,7 @@ function App() {
       ? 'Профиль'
       : screen === 'lectures'
       ? 'Лекции'
-      : screen === 'tests'
+      : screen === 'tests' || screen === 'testResult'
       ? 'Тесты'
       : 'Лекция'
 
@@ -66,7 +68,10 @@ function App() {
         {screen === 'home' && (
           <HomeScreen
             onGoLectures={() => setScreen('lectures')}
-            onGoTests={() => setScreen('tests')}
+            onGoTests={() => {
+              setTestScore(null)
+              setScreen('tests')
+            }}
             onGoPlaceObservation={() => setScreen('placePick')}
           />
 
@@ -104,8 +109,28 @@ function App() {
           />
         )}
 
-
-        {screen === 'tests' && <TestsScreen />}
+        {screen === 'tests' && (
+          <TestsScreen
+            onSubmit={(score, maxScore) => {
+              setTestScore({ score, max: maxScore })
+              setScreen('testResult')
+            }}
+          />
+        )}
+        {screen === 'testResult' && testScore && (
+          <TestResultScreen
+            score={testScore.score}
+            maxScore={testScore.max}
+            onTryAgain={() => {
+              setTestScore(null)
+              setScreen('tests')
+            }}
+            onGoHome={() => {
+              setTestScore(null)
+              setScreen('home')
+            }}
+          />
+        )}
         {screen === 'placePick' && (
           <PlacePickScreen
             places={PLACES}
