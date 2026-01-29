@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 type Answer = {
   id: string
   text: string
@@ -8,6 +10,10 @@ type Question = {
   id: string
   text: string
   answers: Answer[]
+}
+
+type TestsScreenProps = {
+  onSubmit: (score: number, maxScore: number) => void
 }
 
 const QUESTIONS: Question[] = [
@@ -40,7 +46,24 @@ const QUESTIONS: Question[] = [
   },
 ]
 
-function TestsScreen() {
+function TestsScreen({ onSubmit }: TestsScreenProps) {
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
+
+  const handleSelect = (questionId: string, answerId: string) => {
+    setSelectedAnswers((prev) => ({ ...prev, [questionId]: answerId }))
+  }
+
+  const handleSubmit = () => {
+    const correctCount = QUESTIONS.reduce((total, question) => {
+      const selectedAnswerId = selectedAnswers[question.id]
+      const selectedAnswer = question.answers.find((answer) => answer.id === selectedAnswerId)
+      return total + (selectedAnswer?.isCorrect ? 1 : 0)
+    }, 0)
+
+    onSubmit(correctCount, QUESTIONS.length)
+  }
+  const allAnswered = QUESTIONS.every((q) => Boolean(selectedAnswers[q.id]))
+
   return (
     <div>
       <h1>Мини-тест</h1>
@@ -52,8 +75,13 @@ function TestsScreen() {
 
           <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
             {q.answers.map((a) => (
-              <label key={a.id}>
-                <input type="radio" name={q.id} />
+              <label key={a.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="radio"
+                  name={q.id}
+                  checked={selectedAnswers[q.id] === a.id}
+                  onChange={() => handleSelect(q.id, a.id)}
+                />
                 {a.text}
               </label>
             ))}
@@ -62,7 +90,16 @@ function TestsScreen() {
       ))}
 
       <div style={{ marginTop: 24 }}>
-        <button>Проверить</button>
+        <button onClick={handleSubmit} disabled={!allAnswered}>
+  Проверить
+</button>
+
+{!allAnswered && (
+  <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+    Ответь на все вопросы, чтобы получить результат.
+  </div>
+)}
+
       </div>
     </div>
   )
