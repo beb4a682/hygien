@@ -35,6 +35,8 @@ function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null)
   const [dailyMission, setDailyMission] = useState<string | null>(null)
+  type MissionStatus = 'none' | 'active' | 'accepted' | 'done'
+  const [missionStatus, setMissionStatus] = useState<MissionStatus>('none')
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null)
   const [placeScore, setPlaceScore] = useState<{ score: number; max: number } | null>(null)
   const [testScore, setTestScore] = useState<{ score: number; max: number } | null>(null)
@@ -77,17 +79,19 @@ function App() {
             setActiveTestId('hands-test')
             setScreen('tests')
           }}
-
           onGoPlaceObservation={() => setScreen('placePick')}
+
           missionText={dailyMission}
-          onAcceptMission={() => {
-            // пока просто подтверждение, позже дадим XP/галочку
-            // можно добавить alert или тост, но пока оставим пустым
+          missionStatus={missionStatus}
+
+          onAcceptMission={() => setMissionStatus('accepted')}
+          onCompleteMission={() => {
+            setMissionStatus('done')
+            setDailyMission(null)
           }}
-          onPostponeMission={() => {
-            // можно оставить миссию, просто закрыть действие
-          }}
+          onPostponeMission={() => {}}
         />
+
       )}
 
 
@@ -110,8 +114,10 @@ function App() {
             onBack={() => setScreen('lectures')}
             onDone={() => {
               setDailyMission(selectedLecture.mission)
+              setMissionStatus('active')
               setScreen('lectureDone')
             }}
+
 
           />
         )}

@@ -4,32 +4,54 @@ export type Lecture = {
   id: string
   title: string
   description: string
+  tag: string
+  minutes: number
   status: LectureStatus
+  testId: string
+  mission: string
 }
+
 
 export const LECTURES: Lecture[] = [
   {
     id: 'hands',
     title: 'Чистые руки',
-    description: 'Когда мыть руки и как делать это правильно.',
+    description: 'Когда и как мыть руки, чтобы не занести микробы.',
+    tag: 'база',
+    minutes: 3,
     status: 'available',
+    testId: 'hands-test',
+    mission: 'Помой руки перед едой и после улицы.',
   },
   {
     id: 'teeth',
     title: 'Зубы и улыбка',
-    description: 'Как чистить зубы, чтобы они были здоровыми.',
+    description: 'Как ухаживать за зубами каждый день.',
+    tag: 'ежедневно',
+    minutes: 4,
     status: 'locked',
+    testId: 'teeth-test',
+    mission: 'Почисти зубы утром и вечером.',
   },
   {
     id: 'shower',
-    title: 'Душ и тело',
-    description: 'Как заботиться о коже и чистоте тела.',
+    title: 'Чистота тела',
+    description: 'Зачем нужен душ и как заботиться о коже.',
+    tag: 'гигиена',
+    minutes: 4,
     status: 'locked',
+    testId: 'shower-test',
+    mission: 'Прими душ или умойся перед сном.',
   },
   {
     id: 'clothes',
-    title: 'Одежда и порядок',
+    title: 'Опрятная одежда',
     description: 'Почему важно менять одежду и следить за чистотой.',
+    tag: 'порядок',
+    minutes: 3,
     status: 'locked',
+    testId: 'clothes-test',
+    mission: 'Надень чистую одежду на следующий день.',
   },
 ]
+
