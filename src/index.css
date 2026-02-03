@@ -1,0 +1,226 @@
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: rgba(17, 24, 39, 0.65);
+
+  --border: rgba(17, 24, 39, 0.10);
+  --shadow: 0 10px 28px rgba(17, 24, 39, 0.08);
+
+  --radius: 16px;
+  --radius-sm: 12px;
+
+  --pad: 16px;
+
+  --primary: #111827;
+  --primaryText: #ffffff;
+
+  --secondary: #eef2f7;
+  --secondaryText: #111827;
+
+  --focus: rgba(17, 24, 39, 0.18);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button, input {
+  font: inherit;
+}
+
+/* layout */
+.appShell {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.appMain {
+  padding: var(--pad);
+}
+
+/* UI: Card */
+.ui-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.ui-cardTitle {
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.ui-cardText {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* UI: Button */
+.ui-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.ui-btn:active {
+  transform: scale(0.98);
+}
+
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-btn--md { padding: 12px 14px; }
+.ui-btn--sm { padding: 10px 12px; border-radius: 12px; }
+
+.ui-btn--primary {
+  background: var(--primary);
+  color: var(--primaryText);
+}
+
+.ui-btn--secondary {
+  background: var(--secondary);
+  color: var(--secondaryText);
+}
+
+.ui-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* helpers */
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stack { display: grid; gap: 10px; }
+.mtop { margin-top: 14px; }
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: white;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  animation: slideUp 250ms ease forwards;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+.tipCard {
+  background: #fff7e6;
+  border: 1px dashed #f5c26b;
+}
+
+.tipCard h2 {
+  color: #b45309;
+}
+.lectureCard {
+  margin-top: 14px;
+}
+
+.tipCard {
+  background: #fff7e6;
+  border: 1px dashed #f5c26b;
+}
+
+.tipBadge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(245, 194, 107, 0.25);
+  color: #b45309;
+  margin-bottom: 10px;
+}
+.cardMotion {
+  animation: cardIn 220ms ease;
+}
+
+.cardMotion.next {
+  animation-name: cardInNext;
+}
+
+.cardMotion.prev {
+  animation-name: cardInPrev;
+}
+
+@keyframes cardInNext {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cardInPrev {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.answerOption {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 120ms ease;
+}
+
+.answerOption:hover {
+  background: #f2f4f8;
+}
+
+.answerOption.selected {
+  background: var(--secondary);
+  border-color: var(--primary);
+}
+
+.answerOption input {
+  pointer-events: none;
+}
+.answerOption input {
+  accent-color: var(--primary);
+}
+.answerOption input {
+  accent-color: var(--primary);
+}
