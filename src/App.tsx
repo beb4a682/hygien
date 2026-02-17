@@ -30,8 +30,8 @@ import {
   incObservations,
   incMissions,
   type ProfileState,
+  ACHIEVEMENTS,
 } from './data/progression'
-
 
 type Screen =
   | 'home'
@@ -44,13 +44,17 @@ type Screen =
   | 'placePick'
   | 'placeObservation'
   | 'placeResult'
-  type MissionStatus = 'none' | 'active' | 'accepted' | 'done'
 
-    type AppNotification = {
-      text: string
-      actionLabel?: string
-      onAction?: () => void
-    } | null
+type MissionStatus = 'none' | 'active' | 'accepted' | 'done'
+
+type AppNotification = {
+  text: string
+  actionLabel?: string
+  onAction?: () => void
+} | null
+
+const achievementTitle = (id: string) =>
+  ACHIEVEMENTS.find((a) => a.id === id)?.title ?? id
 
 function App() {
   const [missionStatus, setMissionStatus] = useState<MissionStatus>('none')
@@ -59,56 +63,141 @@ function App() {
   const [activeTestId, setActiveTestId] = useState<string>('hands-test')
   const [screen, setScreen] = useState<Screen>('home')
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null)
+
   const [dailyMission, setDailyMission] = useState<string | null>(null)
   const [dailyMissionId, setDailyMissionId] = useState<string | null>(null)
   const [missionDate, setMissionDate] = useState<string | null>(null)
+
+  // ✅ миссия из наблюдения какого места (kitchen/bathroom/...)
+  const [dailyMissionPlaceId, setDailyMissionPlaceId] = useState<string | null>(null)
+
+  // ✅ чеклист мини-миссии
+  const [miniChecklist, setMiniChecklist] = useState<Record<string, boolean>>({})
+
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null)
   const [placeValues, setPlaceValues] = useState<Record<string, number> | null>(null)
   const [testScore, setTestScore] = useState<{ score: number; max: number } | null>(null)
-  const [profile, setProfile] = useState<ProfileState>(() => {
-  const raw = loadJSON<any>('profile', null)
-  return normalizeProfile(raw)
-})
 
-useEffect(() => {
-  saveJSON('profile', profile)
-}, [profile])
- const updateProfile = (fn: (p: ProfileState) => ProfileState) => {
-  setProfile((prev) => unlockAchievements(fn(prev)))
-}
+  const [profile, setProfile] = useState<ProfileState>(() => {
+    const raw = loadJSON<any>('profile', null)
+    return normalizeProfile(raw)
+  })
+
+  useEffect(() => {
+    saveJSON('profile', profile)
+  }, [profile])
+
+  // ✅ загрузка чеклиста 1 раз
+  useEffect(() => {
+    const raw = loadJSON<Record<string, boolean>>('miniChecklist', {})
+    setMiniChecklist(raw ?? {})
+  }, [])
+
+  // ✅ сохранение чеклиста
+  useEffect(() => {
+    saveJSON('miniChecklist', miniChecklist)
+  }, [miniChecklist])
+
+  const updateProfile = (fn: (p: ProfileState) => ProfileState) => {
+    setProfile((prev) => {
+      const before = prev
+      const after = unlockAchievements(fn(prev))
+
+      const beforeSet = new Set(before.achievements)
+      const newlyUnlocked = after.achievements.filter((id) => !beforeSet.has(id))
+
+      if (newlyUnlocked.length > 0) {
+        const first = newlyUnlocked[0]
+        queueMicrotask(() => {
+          setNotification((prevNotif) => {
+            if (prevNotif) return prevNotif
+            return {
+              text: `🏆 Открыто достижение: ${achievementTitle(first)}`,
+              actionLabel: 'Круто',
+              onAction: () => setNotification(null),
+            }
+          })
+        })
+      }
+
+      return after
+    })
+  }
+
+  // ✅ XP за миссию зависит от чеклиста (3/4 = 5 XP, 4/4 = 10 XP)
+  const calcMissionXp = () => {
+    // обычная миссия (без чеклиста)
+    if (!dailyMissionPlaceId) return 5
+
+    // мини-миссия (пока только кухня)
+    if (dailyMissionPlaceId === 'kitchen') {
+      const checked = Object.values(miniChecklist).filter(Boolean).length
+      if (checked >= 4) return 10
+      if (checked >= 3) return 5
+      return 0
+    }
+
+    // на будущее для других мест
+    return 5
+  }
+
+  // ✅ очистка миссии (чтобы пропадала)
+  const clearMission = () => {
+    setDailyMission(null)
+    setDailyMissionId(null)
+    setDailyMissionPlaceId(null)
+    setMissionStatus('none')
+
+    setMiniChecklist({})
+    saveJSON('miniChecklist', {})
+  }
+
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    if (missionDate && missionDate !== today) {
+      // новый день — старая миссия уходит
+      setDailyMission(null)
+      setDailyMissionId(null)
+      setMissionStatus('none')
+      setMissionDate(null)
+
+      // ✅ сброс мини-миссии
+      setDailyMissionPlaceId(null)
+      setMiniChecklist({})
+      saveJSON('miniChecklist', {})
+    }
+  }, [missionDate])
 
   const selectedLecture = useMemo(() => {
     if (!selectedLectureId) return null
     return LECTURES.find((l) => l.id === selectedLectureId) ?? null
   }, [selectedLectureId])
- const giveRandomMission = () => {
-  const pool = MISSIONS
-  if (pool.length === 0) return
-  useEffect(() => {
-  const today = new Date().toISOString().slice(0, 10)
-  if (missionDate && missionDate !== today) {
-    // новый день — старая миссия уходит
-    setDailyMission(null)
-    setDailyMissionId(null)
-    setMissionStatus('none')
-    setMissionDate(null)
+
+  const giveRandomMission = () => {
+    const pool = MISSIONS
+    if (pool.length === 0) return
+
+    const candidates = dailyMissionId ? pool.filter((m) => m.id !== dailyMissionId) : pool
+    const picked = candidates[Math.floor(Math.random() * candidates.length)]
+
+    const today = new Date().toISOString().slice(0, 10)
+    setMissionDate(today)
+
+    setDailyMissionId(picked.id)
+    setDailyMission(picked.text)
+    setMissionStatus('active')
+
+    // ✅ если это НЕ миссия из наблюдения — сбрасываем mini-часть
+    setDailyMissionPlaceId(null)
+    setMiniChecklist({})
+    saveJSON('miniChecklist', {})
+
+    setNotification({
+      text: pickPhrase(PHRASES.mission_new),
+      actionLabel: 'Ок',
+      onAction: () => setNotification(null),
+    })
   }
-}, [missionDate])
-
-  // чтобы не повторять сразу ту же миссию
-  const candidates = dailyMissionId ? pool.filter((m) => m.id !== dailyMissionId) : pool
-  const picked = candidates[Math.floor(Math.random() * candidates.length)]
-
-  setDailyMissionId(picked.id)
-  setDailyMission(picked.text)
-  setMissionStatus('active')
-
-  setNotification({
-    text: pickPhrase(PHRASES.mission_new),
-    actionLabel: 'Ок',
-    onAction: () => setNotification(null),
-  })
-}
 
   const headerTitle =
     screen === 'home'
@@ -121,210 +210,215 @@ useEffect(() => {
       ? 'Тесты'
       : 'Лекция'
 
-
   return (
-  <div className="appShell">
-    <Header
-      onHome={() => {
-        setScreen('home')
-        setSelectedLectureId(null)
-      }}
-      onProfile={() => {
-        setScreen('profile')
-        setSelectedLectureId(null)
-      }}
-      title={headerTitle}
-    />
-
-    <main className="appMain">
-  {screen === 'home' && (
-  <HomeScreen
-    onGoLectures={() => setScreen('lectures')}
-    onGoTests={() => {
-      setTestScore(null)
-      setScreen('tests')
-    }}
-    onGoPlaceObservation={() => setScreen('placePick')}
-    profile={profile}
-    missionText={dailyMission}
-    missionStatus={missionStatus}
-    onAcceptMission={() => {
-      setMissionStatus('accepted')
-      setNotification({
-        text: pickPhrase(PHRASES.mission_accept),
-        actionLabel: 'Ок',
-        onAction: () => setNotification(null),
-      })
-    }}
-    onCompleteMission={() => {
-      setMissionStatus('done')
-      updateProfile((p) => addXp(incMissions(p), 8))
-      setNotification({
-        text: pickPhrase(PHRASES.mission_done),
-        actionLabel: 'Ок',
-        onAction: () => setNotification(null),
-      })
-    }}
-    onPostponeMission={() => {
-      setNotification({
-        text: pickPhrase(PHRASES.mission_later),
-        actionLabel: 'Ок',
-        onAction: () => setNotification(null),
-      })
-    }}
-  />
-)}
-
-
-
- {screen === 'profile' && <ProfileScreen profile={profile} />}
-
-
-  {screen === 'lectures' && (
-    <LecturesScreen
-      lectures={LECTURES}
-      onOpenLecture={(id) => {
-        setSelectedLectureId(id)
-        setScreen('lectureView')
-      }}
-    />
-  )}
-
-  {screen === 'lectureView' && selectedLecture && (
-    <LectureCardsScreen
-      title={selectedLecture.title}
-      cards={LECTURE_CARDS[selectedLecture.id] ?? []}
-      onBack={() => setScreen('lectures')}
-      onDone={() => {
-        updateProfile((p) => addXp(incLectures(p), 10))
-
-        setScreen('lectureDone')
-      }}
-    />
-  )}
-
-  {screen === 'lectureDone' && selectedLecture && (
-    <LectureDoneScreen
-      title={selectedLecture.title}
-      onGoHome={() => {
-        setScreen('home')
-        setSelectedLectureId(null)
-      }}
-      onBackToLectures={() => setScreen('lectures')}
-      onGoTest={() => {
-        setScreen('tests')
-      }}
-    />
-  )}
-
-
-  {screen === 'tests' && (
-  <TestsScreen
-    testId={activeTestId}
-    onSubmit={(score, maxScore) => {
-      setTestScore({ score, max: maxScore })
-      const ratio = maxScore === 0 ? 0 : score / maxScore
-      const xpAward =
-        ratio >= 1 ? 18 :
-        ratio >= 0.8 ? 12 :
-        ratio >= 0.6 ? 3 :
-        0
-
-      updateProfile((p) => addXp(incTests(p), xpAward))
-
-
-
-      // создаём миссию после прохождения теста
-      giveRandomMission()
-
-
-      // показываем уведомление
-      setNotification({
-        text: '🎉 Открыта новая миссия!',
-        actionLabel: 'Перейти',
-        onAction: () => {
+    <div className="appShell">
+      <Header
+        onHome={() => {
           setScreen('home')
-          setNotification(null)
-        },
-      })
+          setSelectedLectureId(null)
+        }}
+        onProfile={() => {
+          setScreen('profile')
+          setSelectedLectureId(null)
+        }}
+        title={headerTitle}
+      />
 
-      setScreen('testResult')
-    }}
-  />
-)}
+      <main className="appMain">
+        {screen === 'home' && (
+          <HomeScreen
+            onGoLectures={() => setScreen('lectures')}
+            onGoTests={() => {
+              setTestScore(null)
+              setScreen('tests')
+            }}
+            onGoPlaceObservation={() => setScreen('placePick')}
+            profile={profile}
+            missionText={dailyMission}
+            missionStatus={missionStatus}
+            onAcceptMission={() => {
+              setMissionStatus('accepted')
+              setNotification({
+                text: pickPhrase(PHRASES.mission_accept),
+                actionLabel: 'Ок',
+                onAction: () => setNotification(null),
+              })
+            }}
+            onCompleteMission={() => {
+              const xp = calcMissionXp()
 
+              setMissionStatus('done')
+              updateProfile((p) => addXp(incMissions(p), xp))
 
-  {screen === 'testResult' && testScore && (
-    <TestResultScreen
-      score={testScore.score}
-      maxScore={testScore.max}
-      onTryAgain={() => {
-        setTestScore(null)
-        setScreen('tests')
-      }}
-      onGoHome={() => {
-        setTestScore(null)
-        setScreen('home')
-      }}
-    />
-  )}
+              setNotification({
+                text: xp >= 10 ? '🔥 Миссия выполнена идеально! +10 XP' : '✅ Миссия выполнена! +5 XP',
+                actionLabel: 'Ок',
+                onAction: () => setNotification(null),
+              })
 
-  {screen === 'placePick' && (
-    <PlacePickScreen
-      places={PLACES}
-      onPick={(placeId) => {
-        setSelectedPlaceId(placeId)
-        setScreen('placeObservation')
-      }}
-    />
-  )}
+              // ✅ миссия пропадает
+              clearMission()
+            }}
+            onPostponeMission={() => {
+              setNotification({
+                text: pickPhrase(PHRASES.mission_later),
+                actionLabel: 'Ок',
+                onAction: () => setNotification(null),
+              })
+            }}
+            achievements={profile.achievements}
+            onOpenAchievement={(id) => {
+              const a = ACHIEVEMENTS.find((x) => x.id === id)
+              if (!a) return
+              setNotification({
+                text: `🏆 ${a.title}\n${a.desc}`,
+                actionLabel: 'Ок',
+                onAction: () => setNotification(null),
+              })
+            }}
+            missionPlaceId={dailyMissionPlaceId}
+            miniChecklist={miniChecklist}
+            onToggleMiniStep={(id, value) => {
+              setMiniChecklist((prev) => ({ ...prev, [id]: value }))
+            }}
+          />
+        )}
 
- {screen === 'placeObservation' && selectedPlaceId && (
-  <PlaceObservationScreen
-    placeTitle={PLACES.find((p) => p.id === selectedPlaceId)?.title ?? 'Место'}
-    criteria={PLACE_CRITERIA[selectedPlaceId] ?? []}
-    onBack={() => setScreen('placePick')}
-    onSubmit={(values, score, maxScore) => {
-      setPlaceValues(values)
-      updateProfile((p) => addXp(incObservations(p), 12))
+        {screen === 'profile' && <ProfileScreen profile={profile} />}
 
-      setScreen('placeResult')
-    }}
-  />
-)}
+        {screen === 'lectures' && (
+          <LecturesScreen
+            lectures={LECTURES}
+            onOpenLecture={(id) => {
+              setSelectedLectureId(id)
+              setScreen('lectureView')
+            }}
+          />
+        )}
 
+        {screen === 'lectureView' && selectedLecture && (
+          <LectureCardsScreen
+            title={selectedLecture.title}
+            cards={LECTURE_CARDS[selectedLecture.id] ?? []}
+            onBack={() => setScreen('lectures')}
+            onDone={() => {
+              updateProfile((p) => addXp(incLectures(p), 10))
+              setScreen('lectureDone')
+            }}
+          />
+        )}
 
-{screen === 'placeResult' && selectedPlaceId && placeValues && (
-  <PlaceResultScreen
-    placeTitle={PLACES.find((p) => p.id === selectedPlaceId)?.title ?? 'Место'}
-    values={placeValues}
-    onGoHome={() => {
-      setScreen('home')
-      setSelectedPlaceId(null)
-      setPlaceValues(null)
-    }}
-    onMakeMission={() => {
-      const title = PLACES.find((p) => p.id === selectedPlaceId)?.title ?? 'место'
-      setDailyMission(`Проведи мини-наблюдение чистоты: ${title}`)
-      setMissionStatus('active')
-      setScreen('home')
-    }}
-  />
-)}
+        {screen === 'lectureDone' && selectedLecture && (
+          <LectureDoneScreen
+            title={selectedLecture.title}
+            onGoHome={() => {
+              setScreen('home')
+              setSelectedLectureId(null)
+            }}
+            onBackToLectures={() => setScreen('lectures')}
+            onGoTest={() => {
+              setScreen('tests')
+            }}
+          />
+        )}
 
-</main>
-{notification && (
-  <Notification
-    text={notification.text}
-    actionLabel={notification.actionLabel}
-    onAction={notification.onAction}
-    onClose={() => setNotification(null)}
-  />
-)}
+        {screen === 'tests' && (
+          <TestsScreen
+            testId={activeTestId}
+            onSubmit={(score, maxScore) => {
+              setTestScore({ score, max: maxScore })
+              const ratio = maxScore === 0 ? 0 : score / maxScore
+              const xpAward =
+                ratio >= 1 ? 18 : ratio >= 0.8 ? 12 : ratio >= 0.6 ? 3 : 0
 
-  </div>
-)
+              updateProfile((p) => addXp(incTests(p), xpAward))
 
+              giveRandomMission()
+
+              setNotification({
+                text: '🎉 Открыта новая миссия!',
+                actionLabel: 'Перейти',
+                onAction: () => {
+                  setScreen('home')
+                  setNotification(null)
+                },
+              })
+
+              setScreen('testResult')
+            }}
+          />
+        )}
+
+        {screen === 'testResult' && testScore && (
+          <TestResultScreen
+            score={testScore.score}
+            maxScore={testScore.max}
+            onTryAgain={() => {
+              setTestScore(null)
+              setScreen('tests')
+            }}
+            onGoHome={() => {
+              setTestScore(null)
+              setScreen('home')
+            }}
+          />
+        )}
+
+        {screen === 'placePick' && (
+          <PlacePickScreen
+            places={PLACES}
+            onPick={(placeId) => {
+              setSelectedPlaceId(placeId)
+              setScreen('placeObservation')
+            }}
+          />
+        )}
+
+        {screen === 'placeObservation' && selectedPlaceId && (
+          <PlaceObservationScreen
+            placeTitle={PLACES.find((p) => p.id === selectedPlaceId)?.title ?? 'Место'}
+            criteria={PLACE_CRITERIA[selectedPlaceId] ?? []}
+            onBack={() => setScreen('placePick')}
+            onSubmit={(values, score, maxScore) => {
+              setPlaceValues(values)
+              updateProfile((p) => addXp(incObservations(p), 12))
+              setScreen('placeResult')
+            }}
+          />
+        )}
+
+        {screen === 'placeResult' && selectedPlaceId && placeValues && (
+          <PlaceResultScreen
+            placeTitle={PLACES.find((p) => p.id === selectedPlaceId)?.title ?? 'Место'}
+            values={placeValues}
+            onGoHome={() => {
+              setScreen('home')
+              setSelectedPlaceId(null)
+              setPlaceValues(null)
+            }}
+            onMakeMission={() => {
+              const title = PLACES.find((p) => p.id === selectedPlaceId)?.title ?? 'место'
+              setDailyMission(`5 минут чистоты: ${title}`)
+              setDailyMissionPlaceId(selectedPlaceId)
+              setMiniChecklist({})
+              saveJSON('miniChecklist', {})
+              setMissionStatus('active')
+              setScreen('home')
+            }}
+          />
+        )}
+      </main>
+
+      {notification && (
+        <Notification
+          text={notification.text}
+          actionLabel={notification.actionLabel}
+          onAction={notification.onAction}
+          onClose={() => setNotification(null)}
+        />
+      )}
+    </div>
+  )
 }
 
 export default App
