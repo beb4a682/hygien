@@ -1,5 +1,4 @@
 import { type ProfileState, xpProgress, roleTitle, ACHIEVEMENTS } from '../data/progression'
-import { ROLE_TITLES } from '../data/progression'
 
 type Props = { profile: ProfileState }
 

@@ -1,28 +1,58 @@
+import { PLACE_CRITERIA, type Criterion } from '../data/placeCriteria'
+import {
+  getWeakCriterionIds,
+  pickMissionsForWeakCriteria,
+} from '../utils/pickObservationMissions'
+import type { PlaceId } from '../data/observationMissions'
+
 type Props = {
+  placeId: PlaceId
   placeTitle: string
   values: Record<string, number>
-  onGoHome: () => void
-  onMakeMission: () => void
+  onAddMissions: (missionIds: string[]) => void
+  onBack: () => void
 }
 
-const verdictByAvg = (avg: number) => {
-  if (avg >= 4) return '🐷 Отлично! Очень чисто.'
-  if (avg >= 3) return '🐷 В целом неплохо, есть мелочи.'
-  if (avg >= 2) return '🐷 Есть над чем поработать.'
-  return '🐷 Стоит обратить внимание на чистоту.'
+function calcScore(criteria: Criterion[], values: Record<string, number>) {
+  let score = 0
+  let max = 0
+  for (const c of criteria) {
+    const v = values[c.id] ?? 0 // 0..4 (если у тебя иначе — скажи)
+    score += v * c.weight
+    max += 4 * c.weight
+  }
+  return { score, max }
+}
+
+function pct(score: number, max: number) {
+  if (max <= 0) return 0
+  return Math.round((score / max) * 100)
+}
+
+function levelTitle(p: number) {
+  if (p >= 85) return 'Отлично'
+  if (p >= 65) return 'Хорошо'
+  if (p >= 45) return 'Нормально'
+  if (p >= 25) return 'Плохо'
+  return 'Очень плохо'
 }
 
 export default function PlaceResultScreen({
+  placeId,
   placeTitle,
   values,
-  onGoHome,
-  onMakeMission,
+  onAddMissions,
+  onBack,
 }: Props) {
-  const scores = Object.values(values)
-  const avg =
-    scores.length === 0
-      ? 0
-      : scores.reduce((a, b) => a + b, 0) / scores.length
+  const criteria = PLACE_CRITERIA[placeId] ?? []
+
+  // считаем слабые пункты "внутри", но НЕ показываем их
+  const weakIds = getWeakCriterionIds(placeId, criteria, values, 2)
+  const missions = pickMissionsForWeakCriteria(placeId, weakIds, 2)
+
+  const { score, max } = calcScore(criteria, values)
+  const percent = pct(score, max)
+  const label = levelTitle(percent)
 
   return (
     <div style={{ padding: 16 }}>
@@ -32,33 +62,74 @@ export default function PlaceResultScreen({
         Место: <strong>{placeTitle}</strong>
       </p>
 
+      {/* Коротко и без "слабых пунктов" */}
       <div
         style={{
-          marginTop: 16,
-          padding: 16,
-          borderRadius: 16,
-          background: '#fff',
-          boxShadow: '0 10px 28px rgba(0,0,0,0.08)',
+          marginTop: 12,
+          border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: 14,
+          padding: 12,
         }}
       >
-        <div style={{ fontSize: 18, fontWeight: 700 }}>
-          {verdictByAvg(avg)}
+        <div style={{ fontSize: 12, opacity: 0.8 }}>Общий результат</div>
+        <div style={{ marginTop: 6, fontSize: 18, fontWeight: 800 }}>
+          {label} — {percent}%
         </div>
-
-        <p style={{ marginTop: 10, opacity: 0.8 }}>
-          Средняя оценка: {avg.toFixed(1)} / 5
-        </p>
+        <div style={{ marginTop: 6, fontSize: 12, opacity: 0.75 }}>
+          Чем выше процент — тем чище и безопаснее место.
+        </div>
       </div>
 
-      <div style={{ display: 'grid', gap: 10, marginTop: 20 }}>
-        <button onClick={onMakeMission}>
-          Сделать миссией дня
-        </button>
+      {/* Мини-миссии снизу — выделенный блок */}
+      {missions.length > 0 && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 12,
+            borderRadius: 16,
+            border: '1px solid rgba(255,255,255,0.18)',
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>Мини-миссии</h2>
+            <span style={{ fontSize: 12, opacity: 0.75 }}>совет</span>
+          </div>
 
-        <button onClick={onGoHome}>
-          На главную
-        </button>
-      </div>
+          <p style={{ marginTop: 6, opacity: 0.8 }}>
+            Хочешь улучшить место? Сделай пару маленьких шагов 👇
+          </p>
+
+          <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>
+            {missions.map((m) => (
+              <div
+                key={m.id}
+                style={{
+                  borderRadius: 14,
+                  padding: 12,
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  background: 'rgba(0,0,0,0.12)',
+                }}
+              >
+                <div style={{ fontWeight: 800 }}>{m.title}</div>
+                <div style={{ marginTop: 6, opacity: 0.85 }}>{m.hint}</div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => onAddMissions(missions.map((m) => m.id))}
+            style={{ marginTop: 12, width: '100%' }}
+          >
+            Добавить мини-миссии
+          </button>
+        </div>
+      )}
+
+      <button onClick={onBack} style={{ marginTop: 12, width: '100%' }}>
+        Назад
+      </button>
     </div>
   )
 }
