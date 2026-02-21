@@ -10,15 +10,17 @@ export type Lecture = {
   testId: string
 }
 
+// база (без status)
+export type LectureBase = Omit<Lecture, 'status'>
 
-export const LECTURES: Lecture[] = [
+// ✅ оставляем имя LECTURES чтобы твой App не падал на импорте
+export const LECTURES: LectureBase[] = [
   {
     id: 'hands',
     title: 'Чистые руки',
     description: 'Когда и как мыть руки, чтобы не занести микробы.',
     tag: 'база',
     minutes: 3,
-    status: 'available',
     testId: 'hands-test',
   },
   {
@@ -27,7 +29,6 @@ export const LECTURES: Lecture[] = [
     description: 'Как ухаживать за зубами каждый день.',
     tag: 'ежедневно',
     minutes: 4,
-    status: 'locked',
     testId: 'teeth-test',
   },
   {
@@ -36,7 +37,6 @@ export const LECTURES: Lecture[] = [
     description: 'Зачем нужен душ и как заботиться о коже.',
     tag: 'гигиена',
     minutes: 4,
-    status: 'locked',
     testId: 'shower-test',
   },
   {
@@ -45,8 +45,6 @@ export const LECTURES: Lecture[] = [
     description: 'Почему важно менять одежду и следить за чистотой.',
     tag: 'порядок',
     minutes: 3,
-    status: 'locked',
     testId: 'clothes-test',
   },
 ]
-

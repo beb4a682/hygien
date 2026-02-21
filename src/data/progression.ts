@@ -15,11 +15,13 @@ export type AchievementId =
 
 export type ProfileState = {
   name: string
-  roleLevel: number // 1..10
-  xpCurrent: number // XP внутри текущего уровня
-  xpTotal: number   // общий XP
+  roleLevel: number
+  xpCurrent: number
+  xpTotal: number
   stats: ProfileStats
   achievements: AchievementId[]
+
+  doneLectures: string[] // ✅ ДОБАВИТЬ
 }
 
 export const MAX_LEVEL = 10
@@ -72,6 +74,18 @@ export function normalizeProfile(p: Partial<ProfileState> | null | undefined): P
       missionsDone: p?.stats?.missionsDone ?? 0,
     },
     achievements: (p?.achievements ?? []) as AchievementId[],
+
+    doneLectures: Array.isArray((p as any)?.doneLectures) ? ((p as any).doneLectures as string[]) : [], // ✅ ДОБАВИТЬ
+  }
+}
+export function markLectureDone(profile: ProfileState, lectureId: string): ProfileState {
+  const set = new Set(profile.doneLectures)
+  if (set.has(lectureId)) return profile
+  set.add(lectureId)
+
+  return {
+    ...profile,
+    doneLectures: Array.from(set),
   }
 }
 

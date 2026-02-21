@@ -1,3 +1,6 @@
+import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+
 type LectureStatus = 'locked' | 'available' | 'done'
 
 type Lecture = {
@@ -12,48 +15,44 @@ type LecturesScreenProps = {
   onOpenLecture: (id: string) => void
 }
 
-function statusBadge(status: LectureStatus) {
-  if (status === 'done') return '✅ Пройдено'
-  if (status === 'available') return '▶ Доступно'
-  return '🔒 Закрыто'
+function badgeFor(status: LectureStatus) {
+  if (status === 'done') return { text: '✅ Пройдено', cls: 'badge success' }
+  if (status === 'available') return { text: '▶ Доступно', cls: 'badge' }
+  return { text: '🔒 Закрыто', cls: 'badge locked' }
 }
 
-function LecturesScreen({ lectures, onOpenLecture }: LecturesScreenProps) {
+export default function LecturesScreen({ lectures, onOpenLecture }: LecturesScreenProps) {
   return (
     <div>
       <h1>Лекции</h1>
       <p>Выбирай тему и проходи шаг за шагом.</p>
 
-      <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
-        {lectures.map((l) => (
-          <div
-            key={l.id}
-            style={{
-              borderRadius: 12,
-              padding: 12,
-              background: '#f5f5f5',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-              <div style={{ fontWeight: 700 }}>{l.title}</div>
-              <div style={{ fontSize: 12, opacity: 0.8 }}>{statusBadge(l.status)}</div>
-            </div>
+      <div className="stack mtop">
+        {lectures.map((l) => {
+          const b = badgeFor(l.status)
 
-            <div style={{ marginTop: 8, opacity: 0.9 }}>{l.description}</div>
+          return (
+            <Card key={l.id} className={l.status === 'locked' ? '' : 'accent'}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <CardTitle>{l.title}</CardTitle>
+                <span className={b.cls}>{b.text}</span>
+              </div>
 
-            <div style={{ marginTop: 12 }}>
-              <button
-                disabled={l.status === 'locked'}
-                onClick={() => onOpenLecture(l.id)}
-              >
-                Открыть
-              </button>
-            </div>
-          </div>
-        ))}
+              <CardText>{l.description}</CardText>
+
+              <div className="row" style={{ marginTop: 12 }}>
+                <Button
+                  variant={l.status === 'locked' ? 'ghost' : 'secondary'}
+                  disabled={l.status === 'locked'}
+                  onClick={() => onOpenLecture(l.id)}
+                >
+                  Открыть
+                </Button>
+              </div>
+            </Card>
+          )
+        })}
       </div>
     </div>
   )
 }
-
-export default LecturesScreen

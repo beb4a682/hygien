@@ -1,124 +1,152 @@
-import { type ProfileState, xpProgress, roleTitle, ACHIEVEMENTS } from '../data/progression'
+import { useMemo, useState } from 'react'
+import { Card, CardTitle, CardText } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+import type { ProfileState } from '../data/progression'
+import { roleTitle, xpProgress } from '../data/progression'
 
-type Props = { profile: ProfileState }
+type Props = {
+  profile: ProfileState
+  onChangeName: (name: string) => void
+  onReset: () => void
+}
 
-export default function ProfileScreen({ profile }: Props) {
-  const { value, need, left } = xpProgress(profile)
-  const percent = Math.min(100, (value / need) * 100)
+export default function ProfileScreen({ profile, onChangeName, onReset }: Props) {
+  const progress = xpProgress(profile)
+  const percent = profile.roleLevel >= 10 ? 100 : Math.min(100, (progress.value / progress.need) * 100)
+
+  const [draftName, setDraftName] = useState(profile.name)
+
+  const isNameChanged = useMemo(() => draftName.trim() !== profile.name.trim(), [draftName, profile.name])
+  const canSave = draftName.trim().length >= 2 && isNameChanged
 
   return (
-    <div style={{ padding: 16 }}>
+    <div>
       <h1>Профиль</h1>
+      <p style={{ marginTop: 6 }}>Твой “паспорт героя” и настройки.</p>
 
-      {/* Верхняя карточка */}
-      <div
-        style={{
-          marginTop: 12,
-          padding: 16,
-          borderRadius: 16,
-          background: '#fff',
-          boxShadow: '0 10px 28px rgba(0,0,0,0.08)',
-          display: 'grid',
-          gap: 10,
-        }}
-      >
-        <div style={{ fontWeight: 800, fontSize: 18 }}>{profile.name}</div>
-        <div style={{ opacity: 0.85 }}>
-          Роль: <strong>{roleTitle(profile.roleLevel)}</strong> (уровень {profile.roleLevel})
+      {/* HERO CARD */}
+      <Card className="mtop soft">
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div
+            style={{
+              width: 54,
+              height: 54,
+              borderRadius: 18,
+              border: '1px solid rgba(93,169,233,0.18)',
+              background: 'rgba(255,255,255,0.92)',
+              boxShadow: '0 10px 22px rgba(93,169,233,0.14)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 26,
+            }}
+            aria-hidden
+          >
+            🧼
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 950, letterSpacing: '-0.02em', fontSize: 18 }}>
+              {profile.name || 'Без имени'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 800, marginTop: 4 }}>
+              {roleTitle(profile.roleLevel)} · уровень {profile.roleLevel}
+            </div>
+          </div>
+
+          <div className="badge success">+5 XP</div>
         </div>
 
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.75 }}>
-            {profile.roleLevel >= 10 ? (
-              <strong>Максимальный уровень</strong>
-            ) : (
-              <>
-                До следующего уровня: <strong>{left} XP</strong> ({value}/{need})
-              </>
-            )}
+        <div style={{ marginTop: 14 }}>
+          <div className="sectionLabel">XP</div>
+
+          <div className="progress" style={{ marginTop: 8 }}>
+            <div className="progressFill" style={{ width: `${percent}%` }} />
           </div>
 
           <div
             style={{
-              height: 10,
-              background: '#eee',
-              borderRadius: 999,
-              marginTop: 6,
-              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 10,
+              gap: 10,
             }}
           >
-            <div
-              style={{
-                height: 10,
-                width: `${profile.roleLevel >= 10 ? 100 : percent}%`,
-                background: '#cfcfcf',
-                borderRadius: 999,
-              }}
-            />
-          </div>
+            <div className="xpChip">
+              <span className="xpDot" />
+              {profile.roleLevel >= 10 ? 'MAX' : `${progress.value} / ${progress.need} XP`}
+            </div>
 
-          <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
-            Всего XP: <strong>{profile.xpTotal}</strong>
+            <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 900 }}>
+              {Math.round(percent)}%
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Статистика */}
-      <div
-        style={{
-          marginTop: 14,
-          padding: 16,
-          borderRadius: 16,
-          background: '#fff',
-          boxShadow: '0 10px 28px rgba(0,0,0,0.08)',
-        }}
-      >
-        <div style={{ fontWeight: 800, marginBottom: 10 }}>Статистика</div>
+        {/* STATS CARDS */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14 }}>
+          <div className="miniCard">
+            <div className="sectionLabel">Уровень</div>
+            <div style={{ fontWeight: 950, marginTop: 6 }}>{profile.roleLevel}</div>
+          </div>
 
-        <div style={{ display: 'grid', gap: 6, fontSize: 13, opacity: 0.9 }}>
-          <div>✅ Тестов пройдено: <strong>{profile.stats.testsDone}</strong></div>
-          <div>📚 Лекций завершено: <strong>{profile.stats.lecturesDone}</strong></div>
-          <div>🔎 Наблюдений сделано: <strong>{profile.stats.observationsDone}</strong></div>
-          <div>🎯 Миссий выполнено: <strong>{profile.stats.missionsDone}</strong></div>
+          <div className="miniCard">
+            <div className="sectionLabel">Роль</div>
+            <div style={{ fontWeight: 950, marginTop: 6 }}>{roleTitle(profile.roleLevel)}</div>
+          </div>
+
+          <div className="miniCard soft" style={{ gridColumn: '1 / -1' }}>
+            <div className="sectionLabel">Подсказка</div>
+            <div style={{ fontWeight: 900, marginTop: 6 }}>
+              Делай миссии — +5 XP за каждую ✅
+            </div>
+          </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Ачивки */}
-      <div
-        style={{
-          marginTop: 14,
-          padding: 16,
-          borderRadius: 16,
-          background: '#fff',
-          boxShadow: '0 10px 28px rgba(0,0,0,0.08)',
-        }}
-      >
-        <div style={{ fontWeight: 800, marginBottom: 10 }}>Ачивки</div>
+      {/* SETTINGS */}
+      <Card className="mtop">
+        <CardTitle>Имя</CardTitle>
+        <CardText>Можно поменять в любой момент.</CardText>
 
-        <div style={{ display: 'grid', gap: 10 }}>
-          {ACHIEVEMENTS.map((a) => {
-            const unlocked = profile.achievements.includes(a.id)
-            return (
-              <div
-                key={a.id}
-                style={{
-                  padding: 12,
-                  borderRadius: 14,
-                  background: unlocked ? '#f3f3f3' : '#fafafa',
-                  opacity: unlocked ? 1 : 0.6,
-                  border: '1px solid rgba(0,0,0,0.06)',
-                }}
-              >
-                <div style={{ fontWeight: 800 }}>
-                  {unlocked ? '🏅 ' : '🔒 '}
-                  {a.title}
-                </div>
-                <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>{a.desc}</div>
-              </div>
-            )
-          })}
+        <div style={{ marginTop: 12, display: 'flex', gap: 10, alignItems: 'center' }}>
+          <input
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            placeholder="Введи имя"
+            style={{
+              flex: 1,
+              height: 44,
+              borderRadius: 14,
+              border: '1px solid rgba(93,169,233,0.18)',
+              background: 'rgba(255,255,255,0.92)',
+              padding: '0 12px',
+              outline: 'none',
+              boxShadow: '0 6px 16px rgba(93,169,233,0.10)',
+            }}
+          />
+
+          <Button
+            variant="primary"
+            disabled={!canSave}
+            onClick={() => onChangeName(draftName.trim())}
+          >
+            Сохранить
+          </Button>
         </div>
-      </div>
+      </Card>
+
+      <Card className="mtop accent">
+        <CardTitle>Сброс прогресса</CardTitle>
+        <CardText>Это удалит прогресс и начнёт заново.</CardText>
+
+        <div className="row" style={{ marginTop: 12 }}>
+          <Button variant="ghost" onClick={onReset}>
+            Сбросить
+          </Button>
+        </div>
+      </Card>
     </div>
   )
 }
