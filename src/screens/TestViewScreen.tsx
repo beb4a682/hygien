@@ -1,18 +1,7 @@
 import { useState } from 'react'
 import { Card, CardText, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-
-type Question = {
-  question: string
-  options: string[]
-  correct: number
-}
-
-type Test = {
-  id: string
-  title: string
-  questions: Question[]
-}
+import type { Test } from '../data/tests'
 
 type Props = {
   test: Test
@@ -20,18 +9,43 @@ type Props = {
   onFinish: (correct: number, total: number) => void
 }
 
+// вытаскиваем варианты ответа из любого распространённого поля
+function getOptions(q: any): string[] {
+  const v =
+    q?.answers ??
+    q?.options ??
+    q?.variants ??
+    q?.choices ??
+    q?.items ??
+    []
+  return Array.isArray(v) ? v : []
+}
+
+// вытаскиваем текст вопроса
+function getQuestionText(q: any): string {
+  return String(q?.text ?? q?.question ?? q?.title ?? 'Вопрос')
+}
+
+// вытаскиваем индекс правильного ответа
+function getCorrectIndex(q: any): number {
+  const v = q?.correctIndex ?? q?.correct ?? q?.answerIndex ?? q?.rightIndex
+  return typeof v === 'number' ? v : 0
+}
+
 export default function TestViewScreen({ test, onBack, onFinish }: Props) {
   const total = test.questions.length
   const [index, setIndex] = useState(0)
-  const [answers, setAnswers] = useState<number[]>([])
+  const [pickedAnswers, setPickedAnswers] = useState<number[]>([])
 
-  const q = test.questions[index]
+  const q = test.questions[index] as any
+  const options = getOptions(q)
+  const correctIndex = getCorrectIndex(q)
 
-  const percent = Math.round(((index + 1) / total) * 100)
+  const percent = total === 0 ? 0 : Math.round(((index + 1) / total) * 100)
 
   const select = (i: number) => {
-    if (answers[index] !== undefined) return
-    setAnswers((prev) => {
+    if (pickedAnswers[index] !== undefined) return
+    setPickedAnswers((prev) => {
       const next = [...prev]
       next[index] = i
       return next
@@ -41,10 +55,11 @@ export default function TestViewScreen({ test, onBack, onFinish }: Props) {
   const next = () => {
     if (index + 1 < total) setIndex(index + 1)
     else {
-      const correct = test.questions.reduce(
-        (s, qq, i) => s + (answers[i] === qq.correct ? 1 : 0),
-        0
-      )
+      const correct = test.questions.reduce((s: number, qq: any, i: number) => {
+        const ci = getCorrectIndex(qq)
+        return s + (pickedAnswers[i] === ci ? 1 : 0)
+      }, 0)
+
       onFinish(correct, total)
     }
   }
@@ -55,7 +70,7 @@ export default function TestViewScreen({ test, onBack, onFinish }: Props) {
         <div>
           <h1>{test.title}</h1>
           <p>
-            Вопрос {index + 1} из {total}
+            Вопрос {Math.min(index + 1, total)} из {total}
           </p>
         </div>
 
@@ -71,28 +86,25 @@ export default function TestViewScreen({ test, onBack, onFinish }: Props) {
         </div>
       </div>
 
-      {/* progress */}
       <div className="progress mtop">
         <div className="progressFill" style={{ width: `${percent}%` }} />
       </div>
 
-      {/* QUESTION */}
       <Card className="mtop soft">
-        <CardTitle>{q.question}</CardTitle>
+        <CardTitle>{getQuestionText(q)}</CardTitle>
         <CardText>Выбери один правильный вариант.</CardText>
       </Card>
 
-      {/* ANSWERS */}
       <div className="stack mtop">
-        {q.options.map((opt, i) => {
-          const picked = answers[index] === i
-          const correct = answers[index] !== undefined && i === q.correct
+        {options.map((opt: string, i: number) => {
+          const picked = pickedAnswers[index] === i
+          const isCorrect = pickedAnswers[index] !== undefined && i === correctIndex
 
           return (
             <button
               key={i}
               className={`answerBtn ${
-                picked ? (correct ? 'answerOk' : 'answerBad') : ''
+                picked ? (isCorrect ? 'answerOk' : 'answerBad') : ''
               }`}
               onClick={() => select(i)}
             >
@@ -108,7 +120,7 @@ export default function TestViewScreen({ test, onBack, onFinish }: Props) {
           Выйти
         </Button>
 
-        <Button disabled={answers[index] === undefined} onClick={next}>
+        <Button disabled={pickedAnswers[index] === undefined} onClick={next}>
           {index + 1 === total ? 'Завершить' : 'Далее'}
         </Button>
       </div>

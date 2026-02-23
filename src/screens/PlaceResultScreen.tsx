@@ -1,142 +1,141 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Card, CardText, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
+import type { PlaceId } from '../data/observationMissions'
+import { PLACE_CRITERIA } from '../data/placeCriteria'
 
 type Criterion = {
   id: string
-  title?: string
-  label?: string
-  hint?: string
+  title: string
   desc?: string
+  hint?: string
 }
 
 type Props = {
+  placeId: PlaceId
   placeTitle: string
-  criteria: Criterion[]
+  values: Record<string, number>
   onBack: () => void
-  onSubmit: (values: Record<string, number>) => void
 }
 
-const scoreLabel = (v: number) => {
-  if (v >= 4) return { t: 'Отлично', cls: 'scorePill ok' }
-  if (v >= 3) return { t: 'Норм', cls: 'scorePill mid' }
-  if (v >= 2) return { t: 'Плохо', cls: 'scorePill bad' }
-  return { t: 'Очень плохо', cls: 'scorePill bad' }
+const scorePill = (v: number) => {
+  if (v >= 4) return { cls: 'scorePill ok', label: 'Отлично' }
+  if (v >= 3) return { cls: 'scorePill mid', label: 'Норм' }
+  if (v >= 2) return { cls: 'scorePill bad', label: 'Плохо' }
+  return { cls: 'scorePill bad', label: 'Очень плохо' }
 }
 
-export default function PlaceObservationScreen({
-  placeTitle,
-  criteria,
-  onBack,
-  onSubmit,
-}: Props) {
-  const init = useMemo(() => {
-    const obj: Record<string, number> = {}
-    for (const c of criteria) obj[c.id] = 3
-    return obj
-  }, [criteria])
-
-  const [values, setValues] = useState<Record<string, number>>(init)
+export default function PlaceResultScreen({ placeId, placeTitle, values, onBack }: Props) {
+  const criteria: Criterion[] = (PLACE_CRITERIA as any)[placeId] ?? []
 
   const avg = useMemo(() => {
-    const ids = criteria.map((c) => c.id)
-    const sum = ids.reduce((s, id) => s + (values[id] ?? 3), 0)
-    return ids.length ? sum / ids.length : 0
+    if (criteria.length === 0) return 0
+    const sum = criteria.reduce((s: number, c: Criterion) => s + (values[c.id] ?? 3), 0)
+    return sum / criteria.length
   }, [criteria, values])
 
   const avgRounded = Math.round(avg * 10) / 10
-  const avgPill = scoreLabel(Math.round(avg))
+  const avgPercent = Math.min(100, (avgRounded / 5) * 100)
+  const avgP = scorePill(Math.round(avg))
 
-  const setScore = (id: string, v: number) => {
-    setValues((prev) => ({ ...prev, [id]: v }))
-  }
+  const weak = useMemo(() => {
+    return criteria
+      .map((c: Criterion) => ({ id: c.id, title: c.title, v: values[c.id] ?? 3 }))
+      .filter((x) => x.v <= 2)
+      .sort((a, b) => a.v - b.v)
+  }, [criteria, values])
 
   return (
     <div>
       <div className="pageHead">
         <div>
-          <h1>{placeTitle}</h1>
-          <p>Оцени каждый пункт по шкале.</p>
+          <h1>Результат</h1>
+          <p>{placeTitle}</p>
         </div>
 
         <div className="pageHeadRight">
-          <span className={`badge ${avgPill.cls}`}>
-            ⭐ {avgRounded}
-          </span>
-          <img
-            src="/mascot-pig-thinking.png"
-            width={54}
-            height={54}
-            alt=""
-            className="pageMascot"
-          />
+          <span className={`badge ${avgP.cls}`}>⭐ {avgRounded}</span>
+          <img src="/mascot-pig.png" width={54} height={54} alt="" className="pageMascot" />
         </div>
       </div>
 
       <Card className="mtop soft">
-        <CardTitle>Шкала</CardTitle>
-        <CardText>1 — очень плохо · 3 — нормально · 5 — отлично</CardText>
+        <CardTitle>Общий балл</CardTitle>
+        <CardText>
+          {avgRounded >= 4
+            ? 'Очень чисто! Так держать 💙'
+            : avgRounded >= 3
+            ? 'Хорошо. Есть пару пунктов для улучшения.'
+            : 'Есть что подтянуть — но это исправляется быстро!'}
+        </CardText>
 
-        <div className="row" style={{ marginTop: 12, flexWrap: 'wrap' }}>
-          <span className="chip">💡 Смотри на реальность, не “идеально”</span>
-          <span className="chip">🧼 Цель — улучшить</span>
+        <div style={{ marginTop: 12 }}>
+          <div className="progress">
+            <div className="progressFill" style={{ width: `${avgPercent}%` }} />
+          </div>
         </div>
       </Card>
 
-      <div className="stack mtop">
-        {criteria.map((c) => {
-          const title = c.title ?? c.label ?? 'Пункт'
-          const hint = c.hint ?? c.desc ?? ''
+      <Card className="mtop accent">
+        <CardTitle>Пункты</CardTitle>
+        <CardText>Оценки по каждому пункту.</CardText>
 
-          const v = values[c.id] ?? 3
-          const pill = scoreLabel(v)
+        <div className="stack" style={{ marginTop: 12 }}>
+          {criteria.map((c: Criterion) => {
+            const v = values[c.id] ?? 3
+            const p = scorePill(v)
 
-          return (
-            <Card key={c.id} className="accent obsCard">
-              <div className="obsTop">
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="obsTitleRow">
-                    <CardTitle>{title}</CardTitle>
-                    <span className={pill.cls}>{pill.t}</span>
-                  </div>
-                  {hint ? <div className="obsHint">{hint}</div> : null}
+            return (
+              <div key={c.id} className="resultRow">
+                <div style={{ flex: 1, minWidth: 0, fontWeight: 950 }}>{c.title}</div>
+                <span className={p.cls}>{v}/5</span>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+
+      <Card className="mtop">
+        <CardTitle>Советы</CardTitle>
+        <CardText>Небольшие улучшения дают большой эффект ✅</CardText>
+
+        <div style={{ marginTop: 12, display: 'grid', gap: 10 }}>
+          {weak.length > 0 ? (
+            weak.slice(0, 4).map((w) => (
+              <div key={w.id} className="miniCard soft">
+                <div style={{ fontWeight: 950 }}>{w.title}</div>
+                <div style={{ marginTop: 6, fontSize: 13, color: 'var(--muted)' }}>
+                  Сделай один маленький шаг сегодня — и завтра будет заметно лучше.
                 </div>
               </div>
-
-              {/* шкала 1..5 */}
-              <div className="obsScale" role="radiogroup" aria-label={title}>
-                {[1, 2, 3, 4, 5].map((n) => {
-                  const active = n === v
-                  return (
-                    <button
-                      key={n}
-                      type="button"
-                      className={`obsDot ${active ? 'active' : ''}`}
-                      onClick={() => setScore(c.id, n)}
-                      aria-checked={active}
-                      role="radio"
-                    >
-                      {n}
-                    </button>
-                  )
-                })}
+            ))
+          ) : (
+            <div className="miniCard soft" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <img
+                src="/mascot-pig-thinking.png"
+                width={56}
+                height={56}
+                alt=""
+                style={{
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 6px 12px rgba(93,169,233,0.22))',
+                }}
+              />
+              <div>
+                <div style={{ fontWeight: 950 }}>Слабых пунктов нет ✨</div>
+                <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                  Отличная работа — место выглядит очень чистым.
+                </div>
               </div>
+            </div>
+          )}
+        </div>
+      </Card>
 
-              <div className="obsFooter">
-                <span className="obsLegend">
-                  {v <= 2 ? 'Нужно улучшить' : v === 3 ? 'Уже неплохо' : 'Супер!'}
-                </span>
-              </div>
-            </Card>
-          )
-        })}
-      </div>
-
-      <div className="row mtop" style={{ justifyContent: 'space-between' }}>
+      <div className="row mtop">
         <Button variant="secondary" onClick={onBack}>
           Назад
         </Button>
-        <Button onClick={() => onSubmit(values)}>Готово</Button>
       </div>
     </div>
   )
