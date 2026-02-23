@@ -64,7 +64,7 @@ export default function PlaceObservationScreen({
             ⭐ {avgRounded}
           </span>
           <img
-            src="/mascot-pig-thinking.png"
+            src="/mascot-pig2.png"
             width={54}
             height={54}
             alt=""

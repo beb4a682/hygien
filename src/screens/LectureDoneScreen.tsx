@@ -79,7 +79,7 @@ export default function LectureDoneScreen({
       <Card className="mtop">
         <div className="lectureDoneFooter">
           <img
-            src="/mascot-pig-thinking.png"
+            src="/mascot-pig2.png"
             width={64}
             height={64}
             alt=""

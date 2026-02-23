@@ -1,43 +1,32 @@
-type HeaderProps = {
-  title?: string
+type Props = {
+  title: string
   onHome: () => void
   onProfile: () => void
 }
 
-function Header({ title = 'Hygiene Level Up', onHome, onProfile }: HeaderProps) {
+export default function Header({ title, onHome, onProfile }: Props) {
   return (
-    <div className="header headerCandy">
-      <div className="headerInner headerInnerCandy">
-        <button className="iconBtn iconBtnCandy" onClick={onHome} aria-label="Home">
-          <span className="iconGlyph">🏠</span>
-        </button>
+    <header className="appHeader">
+      {/* LEFT */}
+      <button
+        className="headerBtn"
+        onClick={onHome}
+        aria-label="Главная"
+      >
+        🏠
+      </button>
 
-        <div className="headerCenter">
-          <div className="headerTitleRow">
-            <div className="headerTitle headerTitleCandy">{title}</div>
+      {/* CENTER */}
+      <div className="headerTitle">{title}</div>
 
-            {/* маленькая “конфетка” справа от заголовка */}
-            <span className="headerPill">чисто ✨</span>
-          </div>
-
-          <div className="headerSub">
-            <img
-              src="/mascot-pig.png"
-              width={22}
-              height={22}
-              alt=""
-              className="headerMascot"
-            />
-            <span>приятный режим гигиены</span>
-          </div>
-        </div>
-
-        <button className="iconBtn iconBtnCandy" onClick={onProfile} aria-label="Profile">
-          <span className="iconGlyph">👤</span>
-        </button>
-      </div>
-    </div>
+      {/* RIGHT */}
+      <button
+        className="headerBtn"
+        onClick={onProfile}
+        aria-label="Профиль"
+      >
+        👤
+      </button>
+    </header>
   )
 }
-
-export default Header

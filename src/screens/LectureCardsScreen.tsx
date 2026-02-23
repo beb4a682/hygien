@@ -48,7 +48,7 @@ export default function LectureCardsScreen({
         <div className="pageHeadRight">
           <span className="badge">{percent}%</span>
           <img
-            src="/mascot-pig-thinking.png"
+            src="/mascot-pig1.png"
             width={52}
             height={52}
             alt=""

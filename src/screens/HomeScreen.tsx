@@ -210,7 +210,7 @@ export default function HomeScreen({
               renderMission(dailyMission)
             ) : (
               <div className="miniCard soft" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <img src="/mascot-pig-thinking.svg" width={52} height={52} alt="" />
+                <img src="/mascot-pig-thinking.png" width={52} height={52} alt="" />
                 <div>
                   <div style={{ fontWeight: 950 }}>Пока нет дневной миссии</div>
                   <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>

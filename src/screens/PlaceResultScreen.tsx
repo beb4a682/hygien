@@ -55,7 +55,7 @@ export default function PlaceResultScreen({ placeId, placeTitle, values, onBack 
 
         <div className="pageHeadRight">
           <span className={`badge ${avgP.cls}`}>⭐ {avgRounded}</span>
-          <img src="/mascot-pig.png" width={54} height={54} alt="" className="pageMascot" />
+          <img src="/mascot-pig2.png" width={54} height={54} alt="" className="pageMascot" />
         </div>
       </div>
 

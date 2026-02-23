@@ -26,7 +26,19 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
   return (
     <div>
       <div className="row" style={{ gap: 12, alignItems: 'center' }}>
-        http://localhost:5173/
+        <img
+  src="/mascot-pig.png"
+  width={60}
+  height={60}
+  alt=""
+  style={{
+    objectFit: 'contain',
+    filter: `
+      drop-shadow(0 8px 16px rgba(93,169,233,0.28))
+      drop-shadow(0 0 18px rgba(93,169,233,0.2))
+    `,
+  }}
+/>
         <div>
           <h1>Профиль</h1>
           <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 800, marginTop: 4 }}>

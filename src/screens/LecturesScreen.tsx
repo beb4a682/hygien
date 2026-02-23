@@ -44,7 +44,7 @@ export default function LecturesScreen({ lectures, onOpenLecture }: LecturesScre
             📚 {doneCount}/{totalCount}
           </div>
           <img
-            src="/mascot-pig.png"
+            src="/mascot-pig1.png"
             width={54}
             height={54}
             alt=""
