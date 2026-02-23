@@ -309,7 +309,7 @@ function App() {
       ? 'Лекции'
       : screen === 'testsList' || screen === 'testView' || screen === 'testResult'
       ? 'Тесты'
-      : 'Лекция'
+      : 'Наблюдение'
 
   // ---------------- ТЕСТЫ ----------------
   const activeTest = useMemo(() => {

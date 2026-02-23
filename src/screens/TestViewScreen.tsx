@@ -1,95 +1,116 @@
-import { useMemo, useState } from 'react'
-import type { Test } from '../data/tests'
+import { useState } from 'react'
+import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+
+type Question = {
+  question: string
+  options: string[]
+  correct: number
+}
+
+type Test = {
+  id: string
+  title: string
+  questions: Question[]
+}
 
 type Props = {
   test: Test
-  onFinish: (correct: number, total: number) => void
   onBack: () => void
+  onFinish: (correct: number, total: number) => void
 }
 
-export default function TestViewScreen({ test, onFinish, onBack }: Props) {
+export default function TestViewScreen({ test, onBack, onFinish }: Props) {
   const total = test.questions.length
   const [index, setIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, number>>({})
+  const [answers, setAnswers] = useState<number[]>([])
 
   const q = test.questions[index]
-  const picked = answers[q.id]
 
-  const correctCount = useMemo(() => {
-    return test.questions.reduce((acc, qq) => {
-      const a = answers[qq.id]
-      if (a === qq.correctIndex) return acc + 1
-      return acc
-    }, 0)
-  }, [answers, test.questions])
+  const percent = Math.round(((index + 1) / total) * 100)
 
-  function pick(i: number) {
-    setAnswers((p) => ({ ...p, [q.id]: i }))
+  const select = (i: number) => {
+    if (answers[index] !== undefined) return
+    setAnswers((prev) => {
+      const next = [...prev]
+      next[index] = i
+      return next
+    })
   }
 
-  function next() {
-    if (index < total - 1) setIndex((v) => v + 1)
-  }
-
-  function prev() {
-    if (index > 0) setIndex((v) => v - 1)
-  }
-
-  function finish() {
-    onFinish(correctCount, total)
+  const next = () => {
+    if (index + 1 < total) setIndex(index + 1)
+    else {
+      const correct = test.questions.reduce(
+        (s, qq, i) => s + (answers[i] === qq.correct ? 1 : 0),
+        0
+      )
+      onFinish(correct, total)
+    }
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <button onClick={onBack}>← Назад</button>
+    <div>
+      <div className="pageHead">
+        <div>
+          <h1>{test.title}</h1>
+          <p>
+            Вопрос {index + 1} из {total}
+          </p>
+        </div>
 
-      <h1 style={{ marginTop: 12 }}>{test.title}</h1>
-      <div style={{ fontSize: 12, opacity: 0.75 }}>
-        Вопрос {index + 1} / {total}
+        <div className="pageHeadRight">
+          <span className="badge">{percent}%</span>
+          <img
+            src="/mascot-pig-thinking.png"
+            width={52}
+            height={52}
+            alt=""
+            className="pageMascot"
+          />
+        </div>
       </div>
 
-      <div style={{ marginTop: 14, fontWeight: 800 }}>{q.text}</div>
+      {/* progress */}
+      <div className="progress mtop">
+        <div className="progressFill" style={{ width: `${percent}%` }} />
+      </div>
 
-      <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
+      {/* QUESTION */}
+      <Card className="mtop soft">
+        <CardTitle>{q.question}</CardTitle>
+        <CardText>Выбери один правильный вариант.</CardText>
+      </Card>
+
+      {/* ANSWERS */}
+      <div className="stack mtop">
         {q.options.map((opt, i) => {
-          const active = picked === i
+          const picked = answers[index] === i
+          const correct = answers[index] !== undefined && i === q.correct
+
           return (
             <button
               key={i}
-              onClick={() => pick(i)}
-              style={{
-                textAlign: 'left',
-                padding: 12,
-                borderRadius: 12,
-                border: '1px solid rgba(0,0,0,0.15)',
-                background: active ? 'rgba(0,0,0,0.06)' : 'white',
-                cursor: 'pointer',
-              }}
+              className={`answerBtn ${
+                picked ? (correct ? 'answerOk' : 'answerBad') : ''
+              }`}
+              onClick={() => select(i)}
             >
-              {opt}
+              <span className="answerIndex">{String.fromCharCode(65 + i)}</span>
+              <span className="answerText">{opt}</span>
             </button>
           )
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-        <button onClick={prev} disabled={index === 0}>
-          Назад
-        </button>
+      <div className="row mtop" style={{ justifyContent: 'space-between' }}>
+        <Button variant="secondary" onClick={onBack}>
+          Выйти
+        </Button>
 
-        {index < total - 1 ? (
-          <button onClick={next} disabled={picked == null}>
-            Дальше
-          </button>
-        ) : (
-          <button onClick={finish} disabled={Object.keys(answers).length !== total}>
-            Завершить
-          </button>
-        )}
-      </div>
-
-      <div style={{ marginTop: 10, fontSize: 12, opacity: 0.7 }}>
-        Чтобы завершить, нужно ответить на все вопросы.
+        <Button disabled={answers[index] === undefined} onClick={next}>
+          {index + 1 === total ? 'Завершить' : 'Далее'}
+        </Button>
       </div>
     </div>
   )

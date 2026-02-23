@@ -1,161 +1,143 @@
 import { useMemo, useState } from 'react'
+import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
 
 type Criterion = {
   id: string
-  text: string
-  help: string
-  weight: 1 | 2 | 3 // оставляем, но больше не показываем пользователю
+  title?: string
+  label?: string
+  hint?: string
+  desc?: string
 }
 
-type PlaceObservationScreenProps = {
+type Props = {
   placeTitle: string
   criteria: Criterion[]
-  onSubmit: (values: Record<string, number>, score: number, maxScore: number) => void
   onBack: () => void
+  onSubmit: (values: Record<string, number>) => void
 }
 
-const SCALE = [
-  { value: 1, label: 'Очень плохо' },
-  { value: 2, label: 'Плохо' },
-  { value: 3, label: 'Норм' },
-  { value: 4, label: 'Хорошо' },
-  { value: 5, label: 'Отлично' },
-] as const
+const scoreLabel = (v: number) => {
+  if (v >= 4) return { t: 'Отлично', cls: 'scorePill ok' }
+  if (v >= 3) return { t: 'Норм', cls: 'scorePill mid' }
+  if (v >= 2) return { t: 'Плохо', cls: 'scorePill bad' }
+  return { t: 'Очень плохо', cls: 'scorePill bad' }
+}
 
-type ScaleValue = (typeof SCALE)[number]['value']
-
-function PlaceObservationScreen({
+export default function PlaceObservationScreen({
   placeTitle,
   criteria,
-  onSubmit,
   onBack,
-}: PlaceObservationScreenProps) {
-  // выбранные оценки: { criterionId: 1..5 }
-  const [ratings, setRatings] = useState<Record<string, ScaleValue>>({})
-  const [step, setStep] = useState(0)
-
-  const current = criteria[step]
-  const currentPicked = current ? ratings[current.id] : undefined
-  const isLast = step === criteria.length - 1
-
-  // maxScore: максимум возможных очков (внутренне) с учетом веса
-  const maxScore = useMemo(() => {
-    return criteria.reduce((sum, c) => sum + c.weight * 5, 0)
+  onSubmit,
+}: Props) {
+  const init = useMemo(() => {
+    const obj: Record<string, number> = {}
+    for (const c of criteria) obj[c.id] = 3
+    return obj
   }, [criteria])
 
-  // score: сумма (оценка 1..5) * вес
-  const score = useMemo(() => {
-    return criteria.reduce((sum, c) => {
-      const r = ratings[c.id]
-      if (!r) return sum
-      return sum + r * c.weight
-    }, 0)
-  }, [criteria, ratings])
+  const [values, setValues] = useState<Record<string, number>>(init)
 
-  // все ли критерии оценены
-  const allRated = useMemo(() => {
-    return criteria.every((c) => Boolean(ratings[c.id]))
-  }, [criteria, ratings])
+  const avg = useMemo(() => {
+    const ids = criteria.map((c) => c.id)
+    const sum = ids.reduce((s, id) => s + (values[id] ?? 3), 0)
+    return ids.length ? sum / ids.length : 0
+  }, [criteria, values])
 
-  const progress = `${Math.min(step + 1, criteria.length)} / ${criteria.length}`
+  const avgRounded = Math.round(avg * 10) / 10
+  const avgPill = scoreLabel(Math.round(avg))
+
+  const setScore = (id: string, v: number) => {
+    setValues((prev) => ({ ...prev, [id]: v }))
+  }
 
   return (
     <div>
-      <button onClick={onBack}>← Назад</button>
+      <div className="pageHead">
+        <div>
+          <h1>{placeTitle}</h1>
+          <p>Оцени каждый пункт по шкале.</p>
+        </div>
 
-      <h1 style={{ marginTop: 12 }}>Наблюдение: {placeTitle}</h1>
-      <p style={{ opacity: 0.9 }}>
-        Оцени каждый пункт по шкале. Это поможет понять, насколько место чистое.
-      </p>
+        <div className="pageHeadRight">
+          <span className={`badge ${avgPill.cls}`}>
+            ⭐ {avgRounded}
+          </span>
+          <img
+            src="/mascot-pig-thinking.png"
+            width={54}
+            height={54}
+            alt=""
+            className="pageMascot"
+          />
+        </div>
+      </div>
 
-      <div style={{ marginTop: 16 }}>
-        {!current ? (
-          <div style={{ opacity: 0.8 }}>Критериев нет.</div>
-        ) : (
-          <div
-            style={{
-              padding: 12,
-              borderRadius: 14,
-              background: '#f5f5f5',
-              display: 'grid',
-              gap: 8,
-            }}
-          >
-            <div style={{ fontWeight: 700 }}>{current.text}</div>
-            <div style={{ fontSize: 12, opacity: 0.85 }}>{current.help}</div>
+      <Card className="mtop soft">
+        <CardTitle>Шкала</CardTitle>
+        <CardText>1 — очень плохо · 3 — нормально · 5 — отлично</CardText>
 
-            {/* Ползунок 1..5 */}
-            <input
-              type="range"
-              min={1}
-              max={5}
-              step={1}
-              value={currentPicked ?? 3}
-              onChange={(e) =>
-                setRatings((prev) => ({
-                  ...prev,
-                  [current.id]: Number(e.target.value) as ScaleValue,
-                }))
-              }
-              style={{ width: '100%' }}
-            />
+        <div className="row" style={{ marginTop: 12, flexWrap: 'wrap' }}>
+          <span className="chip">💡 Смотри на реальность, не “идеально”</span>
+          <span className="chip">🧼 Цель — улучшить</span>
+        </div>
+      </Card>
 
-            <div style={{ fontSize: 12, opacity: 0.8 }}>
-              {currentPicked ? (
-                <>
-                  Выбрано:{' '}
-                  <strong>
-                    {SCALE.find((x) => x.value === currentPicked)?.label}
-                  </strong>
-                </>
-              ) : (
-                'Передвинь ползунок и выбери оценку'
-              )}
-            </div>
+      <div className="stack mtop">
+        {criteria.map((c) => {
+          const title = c.title ?? c.label ?? 'Пункт'
+          const hint = c.hint ?? c.desc ?? ''
 
-            {/* Кнопки шагов */}
-            <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-              <button
-                type="button"
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
-                disabled={step === 0}
-              >
-                ← Назад
-              </button>
+          const v = values[c.id] ?? 3
+          const pill = scoreLabel(v)
 
-              {!isLast ? (
-                <button
-                  type="button"
-                  onClick={() => setStep((s) => Math.min(criteria.length - 1, s + 1))}
-                  disabled={!currentPicked}
-                  style={{ marginLeft: 'auto' }}
-                >
-                  Далее →
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onSubmit(ratings, score, maxScore)}
-                  disabled={!allRated}
-                  style={{ marginLeft: 'auto' }}
-                >
-                  Готово ✅
-                </button>
-              )}
-            </div>
-
-            <div style={{ fontSize: 12, opacity: 0.7 }}>{progress}</div>
-
-            {isLast && !allRated && (
-              <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
-                Нужно оценить все пункты, чтобы получить результат.
+          return (
+            <Card key={c.id} className="accent obsCard">
+              <div className="obsTop">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="obsTitleRow">
+                    <CardTitle>{title}</CardTitle>
+                    <span className={pill.cls}>{pill.t}</span>
+                  </div>
+                  {hint ? <div className="obsHint">{hint}</div> : null}
+                </div>
               </div>
-            )}
-          </div>
-        )}
+
+              {/* шкала 1..5 */}
+              <div className="obsScale" role="radiogroup" aria-label={title}>
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const active = n === v
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`obsDot ${active ? 'active' : ''}`}
+                      onClick={() => setScore(c.id, n)}
+                      aria-checked={active}
+                      role="radio"
+                    >
+                      {n}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="obsFooter">
+                <span className="obsLegend">
+                  {v <= 2 ? 'Нужно улучшить' : v === 3 ? 'Уже неплохо' : 'Супер!'}
+                </span>
+              </div>
+            </Card>
+          )
+        })}
+      </div>
+
+      <div className="row mtop" style={{ justifyContent: 'space-between' }}>
+        <Button variant="secondary" onClick={onBack}>
+          Назад
+        </Button>
+        <Button onClick={() => onSubmit(values)}>Готово</Button>
       </div>
     </div>
   )
 }
-
-export default PlaceObservationScreen

@@ -12,44 +12,37 @@ type Props = {
 
 export default function ProfileScreen({ profile, onChangeName, onReset }: Props) {
   const progress = xpProgress(profile)
-  const percent = profile.roleLevel >= 10 ? 100 : Math.min(100, (progress.value / progress.need) * 100)
+  const percent =
+    profile.roleLevel >= 10 ? 100 : Math.min(100, (progress.value / progress.need) * 100)
 
   const [draftName, setDraftName] = useState(profile.name)
 
-  const isNameChanged = useMemo(() => draftName.trim() !== profile.name.trim(), [draftName, profile.name])
+  const isNameChanged = useMemo(
+    () => draftName.trim() !== profile.name.trim(),
+    [draftName, profile.name]
+  )
   const canSave = draftName.trim().length >= 2 && isNameChanged
 
   return (
     <div>
-      <h1>Профиль</h1>
-      <p style={{ marginTop: 6 }}>Твой “паспорт героя” и настройки.</p>
+      <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+        http://localhost:5173/
+        <div>
+          <h1>Профиль</h1>
+          <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 800, marginTop: 4 }}>
+            Твой “паспорт героя” и настройки 💙
+          </div>
+        </div>
+      </div>
 
-      {/* HERO CARD */}
+      {/* HERO */}
       <Card className="mtop soft">
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div
-            style={{
-              width: 54,
-              height: 54,
-              borderRadius: 18,
-              border: '1px solid rgba(93,169,233,0.18)',
-              background: 'rgba(255,255,255,0.92)',
-              boxShadow: '0 10px 22px rgba(93,169,233,0.14)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 26,
-            }}
-            aria-hidden
-          >
-            🧼
-          </div>
-
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 950, letterSpacing: '-0.02em', fontSize: 18 }}>
               {profile.name || 'Без имени'}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 800, marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 900, marginTop: 4 }}>
               {roleTitle(profile.roleLevel)} · уровень {profile.roleLevel}
             </div>
           </div>
@@ -78,13 +71,12 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
               {profile.roleLevel >= 10 ? 'MAX' : `${progress.value} / ${progress.need} XP`}
             </div>
 
-            <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 900 }}>
+            <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 950 }}>
               {Math.round(percent)}%
             </div>
           </div>
         </div>
 
-        {/* STATS CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14 }}>
           <div className="miniCard">
             <div className="sectionLabel">Уровень</div>
@@ -98,14 +90,14 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
 
           <div className="miniCard soft" style={{ gridColumn: '1 / -1' }}>
             <div className="sectionLabel">Подсказка</div>
-            <div style={{ fontWeight: 900, marginTop: 6 }}>
+            <div style={{ fontWeight: 950, marginTop: 6 }}>
               Делай миссии — +5 XP за каждую ✅
             </div>
           </div>
         </div>
       </Card>
 
-      {/* SETTINGS */}
+      {/* NAME */}
       <Card className="mtop">
         <CardTitle>Имя</CardTitle>
         <CardText>Можно поменять в любой момент.</CardText>
@@ -118,25 +110,28 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
             style={{
               flex: 1,
               height: 44,
-              borderRadius: 14,
+              borderRadius: 16,
               border: '1px solid rgba(93,169,233,0.18)',
               background: 'rgba(255,255,255,0.92)',
               padding: '0 12px',
               outline: 'none',
-              boxShadow: '0 6px 16px rgba(93,169,233,0.10)',
+              boxShadow: 'var(--shadowSm)',
+              fontWeight: 800,
+              color: 'var(--text)',
             }}
           />
 
-          <Button
-            variant="primary"
-            disabled={!canSave}
-            onClick={() => onChangeName(draftName.trim())}
-          >
+          <Button disabled={!canSave} onClick={() => onChangeName(draftName.trim())}>
             Сохранить
           </Button>
         </div>
+
+        <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 10 }}>
+          Минимум 2 символа. Можно поставить ник.
+        </div>
       </Card>
 
+      {/* RESET */}
       <Card className="mtop accent">
         <CardTitle>Сброс прогресса</CardTitle>
         <CardText>Это удалит прогресс и начнёт заново.</CardText>

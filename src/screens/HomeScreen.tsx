@@ -42,19 +42,47 @@ export default function HomeScreen({
   const totalCount = ACHIEVEMENTS.length
 
   const renderMission = (m: TodayMission) => (
-    <div key={m.uid} className="miniCard soft">
-      <div style={{ fontWeight: 900, letterSpacing: '-0.01em' }}>{m.text}</div>
+    <div
+      key={m.uid}
+      className="miniCard"
+      style={{
+        opacity: m.done ? 0.65 : 1,
+      }}
+    >
+      <div style={{ fontWeight: 950, letterSpacing: '-0.01em' }}>{m.text}</div>
 
       <div className="row" style={{ marginTop: 10 }}>
-        <Button onClick={() => onCompleteMission(m.uid)}>Выполнил (+5 XP)</Button>
+        <Button disabled={m.done} onClick={() => onCompleteMission(m.uid)}>
+          {m.done ? 'Выполнено ✅' : 'Выполнил (+5 XP)'}
+        </Button>
       </div>
     </div>
   )
 
   return (
     <div>
-      <h1>Hygiene Level Up</h1>
-      <p style={{ marginTop: 6 }}>Привет 🙂</p>
+      {/* Header with mascot */}
+      <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+        <img
+          src="/mascot-pig.png"
+          width={56}
+          height={56}
+          alt=""
+          style={{
+            objectFit: 'contain',
+            filter: `
+              drop-shadow(0 6px 12px rgba(93,169,233,0.25))
+              drop-shadow(0 0 16px rgba(93,169,233,0.18))
+            `,
+          }}
+        />
+        <div>
+          <h1>Hygiene Level Up</h1>
+          <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 800, marginTop: 4 }}>
+            Давай сделаем день чище ✨
+          </div>
+        </div>
+      </div>
 
       {/* PROGRESS */}
       <Card className="mtop soft">
@@ -63,12 +91,12 @@ export default function HomeScreen({
         <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
           <div style={{ display: 'grid', gap: 6 }}>
             <div className="sectionLabel">Роль</div>
-            <div style={{ fontWeight: 900 }}>{roleTitle(profile.roleLevel)}</div>
+            <div style={{ fontWeight: 950 }}>{roleTitle(profile.roleLevel)}</div>
           </div>
 
           <div style={{ display: 'grid', gap: 6 }}>
             <div className="sectionLabel">Уровень</div>
-            <div style={{ fontWeight: 900 }}>{profile.roleLevel}</div>
+            <div style={{ fontWeight: 950 }}>{profile.roleLevel}</div>
           </div>
 
           <div>
@@ -92,7 +120,7 @@ export default function HomeScreen({
                 {profile.roleLevel >= 10 ? 'MAX' : `${value} / ${need} XP`}
               </div>
 
-              <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 900 }}>
+              <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 950 }}>
                 {Math.round(percent)}%
               </div>
             </div>
@@ -113,25 +141,19 @@ export default function HomeScreen({
         </Button>
       </div>
 
-      {/* ACHIEVEMENTS (GRID) */}
+      {/* ACHIEVEMENTS GRID */}
       <Card className="mtop">
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'baseline' }}>
           <CardTitle>Достижения</CardTitle>
-          <div className="badge">{unlockedCount} / {totalCount}</div>
+          <div className="badge">
+            {unlockedCount} / {totalCount}
+          </div>
         </div>
 
         <CardText>Собирай коллекцию — открывай новые бейджи.</CardText>
-
         <div className="divider" />
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 10,
-            marginTop: 10,
-          }}
-        >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {ACHIEVEMENTS.map((a) => {
             const unlocked = achievements.includes(a.id)
 
@@ -143,7 +165,7 @@ export default function HomeScreen({
                   textAlign: 'left',
                   padding: 14,
                   borderRadius: 16,
-                  border: '1px solid rgba(93,169,233,0.18)',
+                  border: '1px solid rgba(93,169,233,0.16)',
                   background: unlocked ? 'rgba(255,255,255,0.92)' : 'rgba(31,42,55,0.06)',
                   opacity: unlocked ? 1 : 0.62,
                   cursor: 'pointer',
@@ -152,12 +174,12 @@ export default function HomeScreen({
                   overflow: 'hidden',
                 }}
               >
-                <div style={{ fontWeight: 900, fontSize: 13 }}>
+                <div style={{ fontWeight: 950, fontSize: 13 }}>
                   {unlocked ? '🏆 ' : '🔒 '}
                   {a.title}
                 </div>
 
-                <div style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>{a.desc}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{a.desc}</div>
 
                 {unlocked && (
                   <div
@@ -187,7 +209,15 @@ export default function HomeScreen({
             {dailyMission ? (
               renderMission(dailyMission)
             ) : (
-              <div style={{ fontSize: 13, opacity: 0.8 }}>Пока нет дневной миссии.</div>
+              <div className="miniCard soft" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <img src="/mascot-pig-thinking.svg" width={52} height={52} alt="" />
+                <div>
+                  <div style={{ fontWeight: 950 }}>Пока нет дневной миссии</div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                    Скоро появится новая задачка 💙
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -199,8 +229,25 @@ export default function HomeScreen({
             {eventMissions.length > 0 ? (
               eventMissions.map(renderMission)
             ) : (
-              <div style={{ fontSize: 13, opacity: 0.8 }}>
-                Сделай лекцию, тест или наблюдение — появятся миссии.
+              <div className="miniCard soft" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <img
+                  src="/mascot-pig-thinking.png"
+                  width={56}
+                  height={56}
+                  alt=""
+                  style={{
+                    objectFit: 'contain',
+                    filter: `
+                      drop-shadow(0 6px 12px rgba(93,169,233,0.22))
+                    `,
+                  }}
+                />
+                <div>
+                  <div style={{ fontWeight: 950 }}>Тут будут миссии</div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                    Пройди лекцию, тест или наблюдение — и появятся задания.
+                  </div>
+                </div>
               </div>
             )}
           </div>

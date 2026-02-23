@@ -1,120 +1,143 @@
-import { PLACE_CRITERIA, type Criterion } from '../data/placeCriteria'
-import type { PlaceId } from '../data/observationMissions'
-import { getWeakCriterionIds } from '../utils/pickObservationMissions'
+import { useMemo, useState } from 'react'
+import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+
+type Criterion = {
+  id: string
+  title?: string
+  label?: string
+  hint?: string
+  desc?: string
+}
 
 type Props = {
-  placeId: PlaceId
   placeTitle: string
-  values: Record<string, number>
+  criteria: Criterion[]
   onBack: () => void
+  onSubmit: (values: Record<string, number>) => void
 }
 
-function calcScore(criteria: Criterion[], values: Record<string, number>) {
-  let score = 0
-  let max = 0
-  for (const c of criteria) {
-    const v = values[c.id] ?? 1 // 1..5
-    score += v * c.weight
-    max += 5 * c.weight
+const scoreLabel = (v: number) => {
+  if (v >= 4) return { t: 'Отлично', cls: 'scorePill ok' }
+  if (v >= 3) return { t: 'Норм', cls: 'scorePill mid' }
+  if (v >= 2) return { t: 'Плохо', cls: 'scorePill bad' }
+  return { t: 'Очень плохо', cls: 'scorePill bad' }
+}
+
+export default function PlaceObservationScreen({
+  placeTitle,
+  criteria,
+  onBack,
+  onSubmit,
+}: Props) {
+  const init = useMemo(() => {
+    const obj: Record<string, number> = {}
+    for (const c of criteria) obj[c.id] = 3
+    return obj
+  }, [criteria])
+
+  const [values, setValues] = useState<Record<string, number>>(init)
+
+  const avg = useMemo(() => {
+    const ids = criteria.map((c) => c.id)
+    const sum = ids.reduce((s, id) => s + (values[id] ?? 3), 0)
+    return ids.length ? sum / ids.length : 0
+  }, [criteria, values])
+
+  const avgRounded = Math.round(avg * 10) / 10
+  const avgPill = scoreLabel(Math.round(avg))
+
+  const setScore = (id: string, v: number) => {
+    setValues((prev) => ({ ...prev, [id]: v }))
   }
-  return { score, max }
-}
-
-function levelTitleByScore(score: number, max: number) {
-  if (max <= 0) return 'Нормально'
-  const p = Math.round((score / max) * 100)
-  if (p >= 85) return 'Отлично'
-  if (p >= 65) return 'Хорошо'
-  if (p >= 45) return 'Нормально'
-  if (p >= 25) return 'Плохо'
-  return 'Очень плохо'
-}
-
-function tipByCriterionId(id: string) {
-  const map: Record<string, string> = {
-    k1: 'Протри стол и поверхности — липкость и пятна собирают микробы.',
-    k2: 'Убери крошки и упаковки: мусор быстро делает кухню грязной.',
-    k3: 'Проверь мыло и воду рядом — так проще мыть руки перед едой.',
-    k4: 'Если есть запах — проветри и вынеси мусор.',
-    k5: 'Убери грязные салфетки и посуду с глаз.',
-    b1: 'Протри раковину и кран.',
-    b2: 'Мыло должно быть под рукой.',
-    b3: 'Используй чистое полотенце.',
-    b4: 'Убери воду с пола.',
-    b5: 'Проветри ванную.',
-    c1: 'Протри парту.',
-    c2: 'Убери мусор вокруг.',
-    c3: 'После улицы лучше помыть руки.',
-    c4: 'Свежий воздух помогает самочувствию.',
-    c5: 'Разложи вещи.',
-    s1: 'Не трогай мусор руками.',
-    s2: 'Избегай грязных поверхностей.',
-    s3: 'После улицы протри руки.',
-    s4: 'Избегай мест с дымом и вонью.',
-    s5: 'Обходи опасные предметы.',
-  }
-
-  return map[id] ?? 'Сделай небольшой шаг к чистоте.'
-}
-
-export default function PlaceResultScreen({ placeId, placeTitle, values, onBack }: Props) {
-  const criteria = PLACE_CRITERIA[placeId] ?? []
-
-  const { score, max } = calcScore(criteria, values)
-  const label = levelTitleByScore(score, max)
-
-  const weakIds = getWeakCriterionIds(placeId, criteria, values, 2)
-  const tips = weakIds.map(tipByCriterionId)
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Результат</h1>
+    <div>
+      <div className="pageHead">
+        <div>
+          <h1>{placeTitle}</h1>
+          <p>Оцени каждый пункт по шкале.</p>
+        </div>
 
-      <div style={{ marginTop: 8, opacity: 0.8 }}>
-        Место: <strong>{placeTitle}</strong>
-      </div>
-
-      <div
-        style={{
-          marginTop: 12,
-          borderRadius: 16,
-          padding: 14,
-          border: '1px solid rgba(0,0,0,0.08)',
-          background: '#fff',
-        }}
-      >
-        <div style={{ fontSize: 12, opacity: 0.75 }}>Оценка</div>
-        <div style={{ marginTop: 6, fontSize: 20, fontWeight: 900 }}>{label}</div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 12,
-          borderRadius: 16,
-          padding: 14,
-          border: '1px solid rgba(0,0,0,0.08)',
-          background: 'rgba(0,0,0,0.03)',
-        }}
-      >
-        <div style={{ fontSize: 12, opacity: 0.75 }}>Советы</div>
-        <div style={{ marginTop: 8, display: 'grid', gap: 8 }}>
-          {tips.length > 0 ? (
-            tips.map((t, i) => (
-              <div key={i} style={{ fontSize: 13 }}>
-                • {t}
-              </div>
-            ))
-          ) : (
-            <div style={{ fontSize: 13 }}>
-              Всё выглядит нормально. Можно просто поддерживать порядок.
-            </div>
-          )}
+        <div className="pageHeadRight">
+          <span className={`badge ${avgPill.cls}`}>
+            ⭐ {avgRounded}
+          </span>
+          <img
+            src="/mascot-pig-thinking.png"
+            width={54}
+            height={54}
+            alt=""
+            className="pageMascot"
+          />
         </div>
       </div>
 
-      <button onClick={onBack} style={{ marginTop: 14, width: '100%' }}>
-        Назад
-      </button>
+      <Card className="mtop soft">
+        <CardTitle>Шкала</CardTitle>
+        <CardText>1 — очень плохо · 3 — нормально · 5 — отлично</CardText>
+
+        <div className="row" style={{ marginTop: 12, flexWrap: 'wrap' }}>
+          <span className="chip">💡 Смотри на реальность, не “идеально”</span>
+          <span className="chip">🧼 Цель — улучшить</span>
+        </div>
+      </Card>
+
+      <div className="stack mtop">
+        {criteria.map((c) => {
+          const title = c.title ?? c.label ?? 'Пункт'
+          const hint = c.hint ?? c.desc ?? ''
+
+          const v = values[c.id] ?? 3
+          const pill = scoreLabel(v)
+
+          return (
+            <Card key={c.id} className="accent obsCard">
+              <div className="obsTop">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="obsTitleRow">
+                    <CardTitle>{title}</CardTitle>
+                    <span className={pill.cls}>{pill.t}</span>
+                  </div>
+                  {hint ? <div className="obsHint">{hint}</div> : null}
+                </div>
+              </div>
+
+              {/* шкала 1..5 */}
+              <div className="obsScale" role="radiogroup" aria-label={title}>
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const active = n === v
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`obsDot ${active ? 'active' : ''}`}
+                      onClick={() => setScore(c.id, n)}
+                      aria-checked={active}
+                      role="radio"
+                    >
+                      {n}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="obsFooter">
+                <span className="obsLegend">
+                  {v <= 2 ? 'Нужно улучшить' : v === 3 ? 'Уже неплохо' : 'Супер!'}
+                </span>
+              </div>
+            </Card>
+          )
+        })}
+      </div>
+
+      <div className="row mtop" style={{ justifyContent: 'space-between' }}>
+        <Button variant="secondary" onClick={onBack}>
+          Назад
+        </Button>
+        <Button onClick={() => onSubmit(values)}>Готово</Button>
+      </div>
     </div>
   )
 }

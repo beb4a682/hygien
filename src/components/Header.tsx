@@ -6,16 +6,34 @@ type HeaderProps = {
 
 function Header({ title = 'Hygiene Level Up', onHome, onProfile }: HeaderProps) {
   return (
-    <div className="header">
-      <div className="headerInner">
-        <button className="iconBtn" onClick={onHome} aria-label="Home">
-          🏠
+    <div className="header headerCandy">
+      <div className="headerInner headerInnerCandy">
+        <button className="iconBtn iconBtnCandy" onClick={onHome} aria-label="Home">
+          <span className="iconGlyph">🏠</span>
         </button>
 
-        <div className="headerTitle">{title}</div>
+        <div className="headerCenter">
+          <div className="headerTitleRow">
+            <div className="headerTitle headerTitleCandy">{title}</div>
 
-        <button className="iconBtn" onClick={onProfile} aria-label="Profile">
-          👤
+            {/* маленькая “конфетка” справа от заголовка */}
+            <span className="headerPill">чисто ✨</span>
+          </div>
+
+          <div className="headerSub">
+            <img
+              src="/mascot-pig.png"
+              width={22}
+              height={22}
+              alt=""
+              className="headerMascot"
+            />
+            <span>приятный режим гигиены</span>
+          </div>
+        </div>
+
+        <button className="iconBtn iconBtnCandy" onClick={onProfile} aria-label="Profile">
+          <span className="iconGlyph">👤</span>
         </button>
       </div>
     </div>
