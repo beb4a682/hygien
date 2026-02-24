@@ -155,7 +155,7 @@ const role = useMemo(() => roleTitle(profile.roleLevel), [profile.roleLevel])
             <div className="mission-big">
               <img
                 className="mission-big-img"
-                src="/img/missions/pig-mission.png"
+                src="/img/missions/ишп.png"
                 alt=""
               />
 
