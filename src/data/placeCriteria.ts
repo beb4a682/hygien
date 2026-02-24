@@ -4,8 +4,8 @@ export type Criterion = {
   id: string
   title: string
   desc?: string
+  weight?: number
 }
-
 export const PLACE_CRITERIA: Record<PlaceId, Criterion[]> = {
   kitchen: [
     { id: 'k_sink', title: 'Раковина чистая?', desc: 'Нет грязной посуды и налёта.' },

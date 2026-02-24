@@ -76,13 +76,7 @@ export default function TestViewScreen({ test, onBack, onFinish }: Props) {
 
         <div className="pageHeadRight">
           <span className="badge">{percent}%</span>
-          <img
-            src="/mascot-pig-thinking.png"
-            width={52}
-            height={52}
-            alt=""
-            className="pageMascot"
-          />
+         
         </div>
       </div>
 

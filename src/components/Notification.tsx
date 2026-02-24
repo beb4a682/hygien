@@ -1,3 +1,4 @@
+import './notification.css'
 type NotificationProps = {
   text: string
   actionLabel?: string

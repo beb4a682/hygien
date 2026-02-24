@@ -16,13 +16,13 @@ export function getWeakCriterionIds(
   const rows = criteria.map((c) => ({
     id: c.id,
     score: Number(values?.[c.id] ?? 0),
-    weight: c.weight,
+    weight: c.weight ?? 1,
   }))
 
   // сортируем: сначала самые низкие оценки, потом более важные (weight)
   rows.sort((a, b) => {
     if (a.score !== b.score) return a.score - b.score
-    return b.weight - a.weight
+    return (b.weight ?? 1) - (a.weight ?? 1)
   })
 
   return rows.slice(0, limit).map((x) => x.id)

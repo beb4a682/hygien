@@ -53,15 +53,7 @@ export default function LecturesScreen({ lectures, onOpenLecture }: LecturesScre
         </div>
       </div>
 
-      {/* RULE */}
-      <div className="mtop ruleCard">
-        <div className="ruleTitle">Правило</div>
-        <div className="ruleText">Сначала пройди лекцию → потом откроется следующая</div>
-        <div className="ruleOk">✅</div>
-
-        
-      </div>
-
+  
       {/* LIST */}
       <div className="stack mtop">
         {lectures.map((l) => {
