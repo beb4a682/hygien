@@ -1,14 +1,7 @@
-import { useState } from 'react'
-import { Card, CardText, CardTitle } from '../components/ui/Card'
-import { Button } from '../components/ui/Button'
-
-type LectureCard = {
-  id: string
-  title: string
-  body: string
-  image?: string
-  variant?: 'default' | 'tip'
-}
+import { useMemo, useState, useEffect } from 'react'
+import { Card } from '../components/ui/Card'
+import type { LectureCard } from '../data/lectureCards'
+import './lectureCards.css'
 
 type Props = {
   title: string
@@ -17,88 +10,88 @@ type Props = {
   onDone: () => void
 }
 
-export default function LectureCardsScreen({
-  title,
-  cards,
-  onBack,
-  onDone,
-}: Props) {
+export default function LectureCardsScreen({ title, cards, onBack, onDone }: Props) {
+  const total = Math.max(1, cards.length)
   const [index, setIndex] = useState(0)
-  const total = cards.length
-  const card = cards[index]
 
-  const percent = Math.round(((index + 1) / total) * 100)
+  // если меняется лекция/набор карточек — сбрасываем на первую
+  useEffect(() => {
+    setIndex(0)
+  }, [title, cards])
 
-  const next = () => {
-    if (index + 1 < total) setIndex(index + 1)
-    else onDone()
-  }
+  const safeIndex = Math.min(Math.max(0, index), total - 1)
+  const card = cards[safeIndex]
+
+  const percent = useMemo(() => Math.round(((safeIndex + 1) / total) * 100), [safeIndex, total])
+
+  const canPrev = safeIndex > 0
+  const isLast = safeIndex === total - 1
 
   return (
-    <div>
-      {/* HEADER */}
-      <div className="pageHead">
-        <div>
-          <h1>{title}</h1>
-          <p>
-            Карточка {index + 1} из {total}
-          </p>
+    <div className="lcPage">
+      {/* HERO */}
+      <div className="lcHero">
+        <div className="lcHeroLeft">
+          <div className="lcHeroTitle">{title}</div>
+          <div className="lcHeroSub">
+            Карточка {safeIndex + 1} из {total}
+          </div>
         </div>
 
-        <div className="pageHeadRight">
-          <span className="badge">{percent}%</span>
-          <img
-            src="/mascot-pig1.png"
-            width={52}
-            height={52}
-            alt=""
-            className="pageMascot"
-          />
+        <div className="lcHeroRight">
+          <div className="lcPercentPill">{percent}%</div>
+          <img className="lcHeroPig" src="/img/lectures/pig-bubbles.png" alt="" />
         </div>
+
+        <img className="lcBubble b1" src="/img/home/bubble.png" alt="" />
+        <img className="lcBubble b2" src="/img/home/bubble.png" alt="" />
+        <img className="lcBubble b3" src="/img/home/bubble.png" alt="" />
       </div>
 
-      {/* PROGRESS */}
-      <div className="progress mtop">
-        <div className="progressFill" style={{ width: `${percent}%` }} />
+      {/* PROGRESS BAR */}
+      <div className="lcProgressWrap">
+        <div className="lcProgress">
+          <div className="lcProgressFill" style={{ width: `${percent}%` }} />
+        </div>
       </div>
 
       {/* CARD */}
-      <Card className={`mtop lectureCardView ${card.variant === 'tip' ? 'lectureTip' : ''}`}>
-        {card.image && (
-          <img
-            src={card.image}
-            alt=""
-            className="lectureImage"
-          />
-        )}
+      <Card className="lcCard soft">
+        <div className="lcCardTitle">{card?.title ?? ''}</div>
+        <div className="lcCardText">{card?.body ?? ''}</div>
 
-        <CardTitle>{card.title}</CardTitle>
-
-        <CardText>
-          {card.body.split('\n').map((line, i) => (
-            <span key={i}>
-              {line}
-              <br />
-            </span>
-          ))}
-        </CardText>
-
-        {card.variant === 'tip' && (
-          <div className="lectureTipBox">
-            💡 Запомни: маленькие привычки работают лучше всего
-          </div>
-        )}
+        <div className="lcImageWrap">
+          {card?.image ? (
+            <img className="lcImage" src={card.image} alt="" />
+          ) : (
+            <div className="lcImagePlaceholder">
+              <span>Тут будет картинка</span>
+            </div>
+          )}
+        </div>
       </Card>
 
-      {/* CONTROLS */}
-      <div className="row mtop" style={{ justifyContent: 'space-between' }}>
-        <Button variant="secondary" onClick={onBack}>
+      {/* NAV BUTTONS */}
+      <div className="lcNav">
+        <button
+          type="button"
+          className={`lcNavBtn ghost ${!canPrev ? 'disabled' : ''}`}
+          disabled={!canPrev}
+          onClick={() => setIndex((i) => Math.max(0, i - 1))}
+        >
           Назад
-        </Button>
+        </button>
 
-        <Button onClick={next}>
-          {index + 1 === total ? 'Завершить лекцию' : 'Далее'}
-        </Button>
+        <button
+          type="button"
+          className="lcNavBtn primary"
+          onClick={() => {
+            if (isLast) onDone()
+            else setIndex((i) => Math.min(total - 1, i + 1))
+          }}
+        >
+          {isLast ? 'Завершить' : 'Далее'}
+        </button>
       </div>
     </div>
   )

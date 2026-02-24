@@ -1,0 +1,167 @@
+.lectureDonePage {
+  padding: 12px;
+  padding-bottom: 18px;
+}
+
+/* HERO */
+.lectureDoneHero {
+  position: relative;
+  border-radius: 20px;
+  padding: 16px;
+  overflow: hidden;
+
+  background: linear-gradient(180deg, #e8f4ff, #f8fcff);
+  border: 1px solid rgba(170, 210, 255, 0.55);
+}
+
+.lectureDoneTitle {
+  font-size: 30px;
+  font-weight: 950;
+  color: #0d2b55;
+}
+
+.lectureDoneSub {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(13, 43, 85, 0.6);
+}
+
+.lectureDoneHeroRight {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lectureDoneXpPill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(170, 210, 255, 0.6);
+  font-weight: 950;
+}
+
+.lectureDoneHeroImg {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px dashed rgba(170, 210, 255, 0.6);
+}
+
+/* MID IMAGE */
+.lectureDoneMidImage {
+  margin: 14px 0;
+  display: flex;
+  justify-content: center;
+}
+.lectureDoneMidImage img {
+  max-width: 100%;
+  border-radius: 18px;
+}
+
+/* LECTURE CARD */
+.lectureDoneLectureRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.lectureDoneLectureIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.lectureDoneLectureTitle {
+  font-weight: 950;
+  font-size: 18px;
+}
+
+.lectureDoneLectureSub {
+  font-size: 13px;
+  color: rgba(13, 43, 85, 0.55);
+}
+
+/* STATS */
+.lectureDoneStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.lectureDoneStat {
+  padding: 14px;
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(13, 43, 85, 0.55);
+}
+
+.statValue {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 950;
+}
+.statValue.ok {
+  color: #1a8f3a;
+}
+
+/* NEXT */
+.lectureDoneActions {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+/* TIP */
+.lectureDoneTip {
+  margin-top: 14px;
+  background: linear-gradient(180deg, #ffff9e, #fff786);
+}
+
+.lectureDoneTipRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.lectureDoneTipPig {
+  width: 52px;
+  height: 52px;
+}
+
+.lectureDoneTipTitle {
+  font-weight: 950;
+}
+
+.lectureDoneTipText {
+  font-size: 13px;
+  color: rgba(13, 43, 85, 0.7);
+}
+
+/* BUBBLES */
+.lectureDoneBubble {
+  position: absolute;
+  opacity: 0.35;
+  width: 36px;
+  height: 36px;
+}
+.lectureDoneBubble.b1 {
+  right: 20px;
+  bottom: 10px;
+}
+.lectureDoneBubble.b2 {
+  right: 80px;
+  top: 40px;
+}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, CardText, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 
@@ -17,11 +17,12 @@ type Props = {
   onSubmit: (values: Record<string, number>) => void
 }
 
-const scoreLabel = (v: number) => {
-  if (v >= 4) return { t: 'Отлично', cls: 'scorePill ok' }
-  if (v >= 3) return { t: 'Норм', cls: 'scorePill mid' }
-  if (v >= 2) return { t: 'Плохо', cls: 'scorePill bad' }
-  return { t: 'Очень плохо', cls: 'scorePill bad' }
+const labelFor = (v: number) => {
+  if (v === 1) return 'Нет 😕'
+  if (v === 2) return 'Скорее нет 🙁'
+  if (v === 3) return '50/50 🤔'
+  if (v === 4) return 'Скорее да 🙂'
+  return 'Да 😄'
 }
 
 export default function PlaceObservationScreen({
@@ -37,18 +38,35 @@ export default function PlaceObservationScreen({
   }, [criteria])
 
   const [values, setValues] = useState<Record<string, number>>(init)
+  const [step, setStep] = useState(0)
 
-  const avg = useMemo(() => {
-    const ids = criteria.map((c) => c.id)
-    const sum = ids.reduce((s, id) => s + (values[id] ?? 3), 0)
-    return ids.length ? sum / ids.length : 0
-  }, [criteria, values])
+  useEffect(() => {
+    setValues(init)
+    setStep(0)
+  }, [init])
 
-  const avgRounded = Math.round(avg * 10) / 10
-  const avgPill = scoreLabel(Math.round(avg))
+  const total = criteria.length
+  const current = criteria[step]
 
-  const setScore = (id: string, v: number) => {
-    setValues((prev) => ({ ...prev, [id]: v }))
+  const title = current?.title ?? current?.label ?? 'Пункт'
+  const hint = current?.hint ?? current?.desc ?? ''
+  const v = current ? values[current.id] ?? 3 : 3
+
+  const percent = total === 0 ? 0 : Math.round(((step + 1) / total) * 100)
+
+  const setScore = (score: number) => {
+    if (!current) return
+    setValues((prev) => ({ ...prev, [current.id]: score }))
+  }
+
+  const goNext = () => {
+    if (step + 1 < total) setStep((s) => s + 1)
+    else onSubmit(values)
+  }
+
+  const goPrev = () => {
+    if (step > 0) setStep((s) => s - 1)
+    else onBack()
   }
 
   return (
@@ -56,87 +74,70 @@ export default function PlaceObservationScreen({
       <div className="pageHead">
         <div>
           <h1>{placeTitle}</h1>
-          <p>Оцени каждый пункт по шкале.</p>
+          <p>
+            Пункт {Math.min(step + 1, total)} из {total}
+          </p>
         </div>
 
         <div className="pageHeadRight">
-          <span className={`badge ${avgPill.cls}`}>
-            ⭐ {avgRounded}
-          </span>
-          <img
-            src="/mascot-pig2.png"
-            width={54}
-            height={54}
-            alt=""
-            className="pageMascot"
-          />
+          <span className="badge">{percent}%</span>
         </div>
+      </div>
+
+      <div className="progress mtop">
+        <div className="progressFill" style={{ width: `${percent}%` }} />
       </div>
 
       <Card className="mtop soft">
         <CardTitle>Шкала</CardTitle>
-        <CardText>1 — очень плохо · 3 — нормально · 5 — отлично</CardText>
+        <CardText>Потяни “язычок” и выбери ответ</CardText>
+      </Card>
 
-        <div className="row" style={{ marginTop: 12, flexWrap: 'wrap' }}>
-          <span className="chip">💡 Смотри на реальность, не “идеально”</span>
-          <span className="chip">🧼 Цель — улучшить</span>
+      <Card className="mtop accent obsCard">
+        <div className="obsTop">
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="obsTitleRow">
+              <CardTitle>{title}</CardTitle>
+              <span className={`scorePill v${v}`}>{labelFor(v)}</span>
+            </div>
+
+            {hint ? <div className="obsHint">{hint}</div> : null}
+          </div>
+        </div>
+
+        {/* СЛАЙДЕР */}
+        <div className="sliderWrap">
+          <div className="sliderRow">
+            <span className="sliderN">1</span>
+
+            <input
+              className={`slider v${v}`}
+              type="range"
+              min={1}
+              max={5}
+              step={1}
+              value={v}
+              onChange={(e) => setScore(Number(e.target.value))}
+              aria-label={title}
+            />
+
+            <span className="sliderN">5</span>
+          </div>
+
+          <div className="sliderMeta">
+            <span className="chip soft">💡 Оцени честно</span>
+          </div>
         </div>
       </Card>
 
-      <div className="stack mtop">
-        {criteria.map((c) => {
-          const title = c.title ?? c.label ?? 'Пункт'
-          const hint = c.hint ?? c.desc ?? ''
-
-          const v = values[c.id] ?? 3
-          const pill = scoreLabel(v)
-
-          return (
-            <Card key={c.id} className="accent obsCard">
-              <div className="obsTop">
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="obsTitleRow">
-                    <CardTitle>{title}</CardTitle>
-                    <span className={pill.cls}>{pill.t}</span>
-                  </div>
-                  {hint ? <div className="obsHint">{hint}</div> : null}
-                </div>
-              </div>
-
-              {/* шкала 1..5 */}
-              <div className="obsScale" role="radiogroup" aria-label={title}>
-                {[1, 2, 3, 4, 5].map((n) => {
-                  const active = n === v
-                  return (
-                    <button
-                      key={n}
-                      type="button"
-                      className={`obsDot ${active ? 'active' : ''}`}
-                      onClick={() => setScore(c.id, n)}
-                      aria-checked={active}
-                      role="radio"
-                    >
-                      {n}
-                    </button>
-                  )
-                })}
-              </div>
-
-              <div className="obsFooter">
-                <span className="obsLegend">
-                  {v <= 2 ? 'Нужно улучшить' : v === 3 ? 'Уже неплохо' : 'Супер!'}
-                </span>
-              </div>
-            </Card>
-          )
-        })}
-      </div>
-
       <div className="row mtop" style={{ justifyContent: 'space-between' }}>
-        <Button variant="secondary" onClick={onBack}>
-          Назад
+        <Button variant="secondary" onClick={goPrev}>
+          {step === 0 ? 'Назад' : 'Предыдущий'}
         </Button>
-        <Button onClick={() => onSubmit(values)}>Готово</Button>
+
+        <Button onClick={goNext}>
+          {step + 1 === total ? 'Готово' : 'Далее'}
+        </Button>
       </div>
     </div>
   )

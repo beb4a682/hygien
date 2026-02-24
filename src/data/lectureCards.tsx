@@ -14,7 +14,8 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
       body:
         'Руки касаются многих поверхностей и предметов.\n' +
         'На них могут быть микробы — невидимые организмы, которые могут вызывать болезни,\n',
-    },
+      image: '/img/lectures/1.png'
+      },
     {
       id: 'hands-rules',
       title: 'Главные правила',
@@ -24,6 +25,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• мыть руки после игр на улице и контакта с животными\n' +
         '• мыть руки после кашля, чихания или соплей\n' +
         '• использовать мыло, если руки видимо грязные',
+      image: '/img/lectures/2.png'
     },
     {
       id: 'hands-how',
@@ -35,6 +37,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '4) Мой руки не меньше 20 секунд\n' +
         '5) Тщательно смой мыло\n' +
         '6) Вытри руки чистым полотенцем или бумажным полотенцем',
+      image: '/img/lectures/3.png'
     },
     {
       id: 'hands-mistakes',
@@ -43,12 +46,14 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• мыть руки слишком быстро\n' +
         '• намыливать только ладони\n' +
         '• вытирать руки грязным полотенцем',
+      image: '/img/lectures/3а.png'
     },
     {
       id: 'hands-tip',
       title: 'Совет',
       body: 'Можно напевать короткую песенку — так легко отмыть руки 20 секунд 🙂',
       variant: 'tip',
+      image: '/img/lectures/4.png'
     },
   ],
 
@@ -60,6 +65,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         'Чистка зубов помогает удалять остатки пищи и налёт.\n' +
         'Если их не убирать, может появиться кариес, воспаление дёсен\n' +
         'и неприятный запах изо рта.\n',
+         image: '/img/lectures/1и.png'
     },
     {
       id: 'teeth-rules',
@@ -69,6 +75,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• использовать зубную пасту\n' +
         '• чистить зубы не меньше 2 минут\n' +
         '• полоскать рот водой после еды',
+      image: '/img/lectures/4и.png'
     },
     {
       id: 'teeth-how',
@@ -80,6 +87,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '4) Почисти передние, боковые и жевательные поверхности\n' +
         '5) Почисти язык\n' +
         '6) Прополощи рот тёплой водой',
+      image: '/img/lectures/3и.png'
     },
     {
       id: 'teeth-mistakes',
@@ -88,12 +96,14 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• чистить зубы слишком быстро\n' +
         '• чистить только передние зубы\n' +
         '• пропускать вечернюю чистку',
+        image: '/img/lectures/5и.png'
     },
     {
       id: 'teeth-tip',
       title: 'Совет',
       body: 'Поставь таймер на 2 минуты — так проще чистить зубы правильно 🙂',
       variant: 'tip',
+      image: '/img/lectures/4.png'
     },
   ],
 
@@ -104,6 +114,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
       body:
         'Кожа — это самый большой орган тела.\n' +
         'В течение дня на коже скапливаются пот, грязь и микробы.\n',
+      image: '/img/lectures/1в.png'
     },
     {
       id: 'shower-rules',
@@ -113,6 +124,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• умывать лицо и шею утром и вечером\n' +
         '• использовать тёплую, но не горячую воду\n' +
         '• вытираться чистым полотенцем',
+      image: '/img/lectures/2в.png'
     },
     {
       id: 'shower-how',
@@ -123,6 +135,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '3) Намыль тело мылом, уделяя внимание локтям, подмышкам и ногам\n' +
         '4) Полностью смой мыло водой\n' +
         '5) Вытри тело чистым полотенцем',
+        image: '/img/lectures/3в.png'
     },
     {
       id: 'shower-mistakes',
@@ -131,12 +144,15 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• использовать слишком горячую воду\n' +
         '• пропускать умывание лица\n' +
         '• оставлять влажную одежду без просушки',
+      image: '/img/lectures/4в.png'
     },
     {
       id: 'shower-tip',
       title: 'Совет',
       body: 'После душа всегда вытирайся насухо — так коже будет комфортнее 🙂',
       variant: 'tip',
+      image: '/img/lectures/4.png'
+      
     },
   ],
   clothes: [
@@ -146,6 +162,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
       body:
         'Чистая одежда и обувь помогают сохранить здоровье кожи\n' +
         'и защищают дом от уличной грязи и микробов.',
+      image: '/img/lectures/1к.png'
     },
     {
       id: 'clothes-rules',
@@ -156,6 +173,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• носить чистую домашнюю одежду\n' +
         '• сушить мокрую одежду и обувь\n' +
         '• хранить одежду и обувь на своих местах',
+        image: '/img/lectures/2к.png'
     },
     {
       id: 'clothes-how',
@@ -166,6 +184,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '3) Положи грязную одежду в корзину для стирки\n' +
         '4) Очисти обувь от грязи\n' +
         '5) Поставь обувь сушиться, если она мокрая',
+      image: '/img/lectures/3к.png'
     },
     {
       id: 'clothes-mistakes',
@@ -175,12 +194,14 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• ходить дома в уличной обуви\n' +
         '• не сушить мокрую обувь\n' +
         '• бросать одежду где попало',
+      image: '/img/lectures/4к.png'
     },
     {
       id: 'clothes-tip',
       title: 'Совет',
       body: 'Домашняя и уличная одежда должны храниться отдельно 🙂',
       variant: 'tip',
+      image: '/img/lectures/4.png'
     },
   ],
 
@@ -191,6 +212,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
       body:
         'Чистота перед едой помогает защитить организм от микробов\n' +
         'и избежать проблем с животом.',
+        image: '/img/lectures/1п.png'
     },
     {
       id: 'food-rules',
@@ -201,6 +223,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• есть из чистой посуды\n' +
         '• есть за чистым столом\n' +
         '• не трогать еду грязными руками',
+        image: '/img/lectures/2п.png'
     },
     {
       id: 'food-how',
@@ -211,6 +234,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '3) Протри стол перед едой\n' +
         '4) Возьми чистую тарелку и приборы\n' +
         '5) Убери лишние предметы со стола',
+        image: '/img/lectures/3п.png'
     },
     {
       id: 'food-mistakes',
@@ -220,12 +244,14 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• не мыть продукты\n' +
         '• есть за грязным столом\n' +
         '• класть еду на грязную поверхность',
+        image: '/img/lectures/4п.png'
     },
     {
       id: 'food-tip',
       title: 'Совет',
       body: 'Перед едой всегда начинай с мытья рук 🙂',
       variant: 'tip',
+      image: '/img/lectures/4.png'
     },
   ],
 
@@ -236,12 +262,9 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
       body:
         'Сон помогает телу отдыхать, расти\n' +
         'и набираться сил для нового дня.',
+        image: '/img/lectures/1й.png'
     },
-    {
-      id: 'sleep-how-much',
-      title: 'Сколько нужно спать',
-      body: 'Детям рекомендуется спать 7–9 часов каждую ночь.',
-    },
+
     {
       id: 'sleep-rules',
       title: 'Главные правила',
@@ -251,6 +274,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• спать в чистой постели\n' +
         '• убирать экраны перед сном\n' +
         '• готовиться ко сну каждый вечер',
+        image: '/img/lectures/2й.png'
     },
     {
       id: 'sleep-how',
@@ -261,6 +285,7 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '3) Выключи телефон, планшет и телевизор\n' +
         '4) Проветри комнату\n' +
         '5) Ляг в кровать и спокойно расслабься',
+        image: '/img/lectures/3й.png'
     },
     {
       id: 'sleep-mistakes',
@@ -270,12 +295,14 @@ export const LECTURE_CARDS: Record<string, LectureCard[]> = {
         '• использовать телефон перед сном\n' +
         '• спать меньше 7 часов\n' +
         '• засыпать в грязной одежде',
+        image: '/img/lectures/4й.png'
     },
     {
       id: 'sleep-tip',
       title: 'Совет',
       body: 'Один и тот же режим сна помогает легче засыпать 🙂',
       variant: 'tip',
+      image: '/img/lectures/4.png'
     },
   ],
 }

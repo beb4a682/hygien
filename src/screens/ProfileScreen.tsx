@@ -1,16 +1,30 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Card, CardTitle, CardText } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-import type { ProfileState } from '../data/progression'
-import { roleTitle, xpProgress } from '../data/progression'
-
+import {
+  ACHIEVEMENTS,
+  type AchievementId,
+  type ProfileState,
+  roleTitle,
+  xpProgress,
+} from '../data/progression'
+import './profile.css'
 type Props = {
   profile: ProfileState
   onChangeName: (name: string) => void
   onReset: () => void
+
+  achievements: AchievementId[]
+  onOpenAchievement: (id: AchievementId) => void
 }
 
-export default function ProfileScreen({ profile, onChangeName, onReset }: Props) {
+export default function ProfileScreen({
+  profile,
+  onChangeName,
+  onReset,
+  achievements,
+  onOpenAchievement,
+}: Props) {
   const progress = xpProgress(profile)
   const percent =
     profile.roleLevel >= 10 ? 100 : Math.min(100, (progress.value / progress.need) * 100)
@@ -23,22 +37,41 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
   )
   const canSave = draftName.trim().length >= 2 && isNameChanged
 
+  // achievements carousel
+  const unlockedCount = achievements.length
+  const totalCount = ACHIEVEMENTS.length
+
+  const trackRef = useRef<HTMLDivElement | null>(null)
+
+  const scrollByCards = (dir: -1 | 1) => {
+    const el = trackRef.current
+    if (!el) return
+    const amount = Math.round(el.clientWidth * 0.78)
+    el.scrollBy({ left: dir * amount, behavior: 'smooth' })
+  }
+
+  // expects:
+  // public/img/achievements/<id>.png
+  // public/img/achievements/<id>-gray.png
+  const imgForAchievement = (id: string, unlocked: boolean) =>
+    unlocked ? `/img/achievements/${id}.png` : `/img/achievements/${id}-gray.png`
+
   return (
     <div>
       <div className="row" style={{ gap: 12, alignItems: 'center' }}>
         <img
-  src="/mascot-pig.png"
-  width={60}
-  height={60}
-  alt=""
-  style={{
-    objectFit: 'contain',
-    filter: `
-      drop-shadow(0 8px 16px rgba(93,169,233,0.28))
-      drop-shadow(0 0 18px rgba(93,169,233,0.2))
-    `,
-  }}
-/>
+          src="src/assets/mascot-pig.png"
+          width={60}
+          height={60}
+          alt=""
+          style={{
+            objectFit: 'contain',
+            filter: `
+              drop-shadow(0 8px 16px rgba(93,169,233,0.28))
+              drop-shadow(0 0 18px rgba(93,169,233,0.2))
+            `,
+          }}
+        />
         <div>
           <h1>Профиль</h1>
           <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 800, marginTop: 4 }}>
@@ -102,9 +135,7 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
 
           <div className="miniCard soft" style={{ gridColumn: '1 / -1' }}>
             <div className="sectionLabel">Подсказка</div>
-            <div style={{ fontWeight: 950, marginTop: 6 }}>
-              Делай миссии — +5 XP за каждую ✅
-            </div>
+            <div style={{ fontWeight: 950, marginTop: 6 }}>Делай миссии — +5 XP за каждую ✅</div>
           </div>
         </div>
       </Card>
@@ -140,6 +171,57 @@ export default function ProfileScreen({ profile, onChangeName, onReset }: Props)
 
         <div style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 10 }}>
           Минимум 2 символа. Можно поставить ник.
+        </div>
+      </Card>
+
+      {/* ACHIEVEMENTS */}
+      <Card className="mtop">
+        <div className="achHead">
+          <CardTitle>Достижения</CardTitle>
+          <div className="badge">
+            {unlockedCount} / {totalCount}
+          </div>
+        </div>
+
+        <CardText>Собирай коллекцию — открывай новые бейджи.</CardText>
+        <div className="divider" />
+
+        <div className="achCarousel">
+          <button className="achArrow left" type="button" onClick={() => scrollByCards(-1)}>
+            ‹
+          </button>
+
+          <div className="achTrack" ref={trackRef}>
+            {ACHIEVEMENTS.map((a) => {
+              const unlocked = achievements.includes(a.id)
+
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  className={`achCard ${unlocked ? 'unlocked' : 'locked'}`}
+                  onClick={() => onOpenAchievement(a.id)}
+                >
+                  <img
+                    className="achImg"
+                    src={imgForAchievement(a.id, unlocked)}
+                    alt={a.title}
+                    draggable={false}
+                    onError={(e) => {
+                      ;(e.currentTarget as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+
+                  <div className="achTitle">{a.title}</div>
+                  <div className="achDesc">{a.desc}</div>
+                </button>
+              )
+            })}
+          </div>
+
+          <button className="achArrow right" type="button" onClick={() => scrollByCards(1)}>
+            ›
+          </button>
         </div>
       </Card>
 

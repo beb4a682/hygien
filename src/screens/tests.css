@@ -1,0 +1,459 @@
+/* ===== TEST ITEM (как лекции) ===== */
+/* ===== PAGE ===== */
+.testsPage{
+  min-height: 100vh;
+  padding: 16px 16px 22px;
+  background:
+    radial-gradient(900px 520px at 70% 20%, rgba(255,255,255,0.85), rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, #EEF6FF 0%, #DCEBFF 55%, #D3E6FF 100%);
+}
+
+/* ===== HERO ===== */
+.testsHero{
+  position: relative;
+  margin-top: 10px;
+  border-radius: 26px;
+  padding: 18px 16px;
+  overflow: hidden;
+
+  background:
+    radial-gradient(520px 220px at 30% 35%, rgba(255,255,255,0.88), rgba(255,255,255,0) 62%),
+    linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.52) 100%);
+  border: 1px solid rgba(170,210,255,0.55);
+  box-shadow:
+    0 16px 34px rgba(0,70,140,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.92);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.testsHeroText{ position: relative; z-index: 2; }
+
+.testsHeroTitle{
+  font-size: 36px;
+  font-weight: 950;
+  letter-spacing: -0.02em;
+  color: rgba(13,43,85,0.92);
+}
+
+.testsHeroSub{
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(13,43,85,0.55);
+  line-height: 1.25;
+}
+
+/* right block in hero */
+.testsHeroRight{
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* доступно pill */
+.testsAvailPill{
+  width: 110px;
+  border-radius: 20px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.86);
+  border: 1px solid rgba(170,210,255,0.55);
+  box-shadow: 0 14px 22px rgba(0,70,140,0.08);
+}
+
+.testsAvailTop{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 900;
+  color: rgba(13,43,85,0.75);
+  text-transform: lowercase;
+}
+
+.testsAvailIcon{ font-size: 18px; }
+
+.testsAvailNum{
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 950;
+  color: rgba(13,43,85,0.92);
+}
+
+/* hero pig image (важно: ограничение размера!) */
+.testsHeroPig{
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 10px 16px rgba(0,70,140,0.14));
+}
+
+/* bubbles */
+.testsBubble{
+  position: absolute;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.testsBubble.b1{ width: 56px; right: 160px; top: 20px; opacity: .45; }
+.testsBubble.b2{ width: 40px; right: 220px; top: 56px; opacity: .33; }
+.testsBubble.b3{ width: 34px; right: 150px; top: 82px; opacity: .26; }
+.testsBubble.b4{ width: 28px; right: 210px; top: 94px; opacity: .20; }
+
+/* ===== RULE CARD ===== */
+.testsRuleCard{
+  margin-top: 12px;
+  border-radius: 22px !important;
+  padding: 14px 14px 12px !important;
+  background: rgba(255,255,255,0.80);
+  border: 1px solid rgba(170,210,255,0.55);
+  box-shadow: 0 14px 26px rgba(0,70,140,0.08);
+}
+
+.testsRuleRow{
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.testsRuleCheck{ font-size: 18px; }
+
+.testsGoLecturesBtn{
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(93,169,233,0.20);
+  background: linear-gradient(180deg, rgba(234,244,255,0.98), rgba(255,255,255,0.94));
+  box-shadow: 0 12px 22px rgba(93,169,233,0.12);
+  font-size: 14px;
+  font-weight: 950;
+  color: rgba(13,43,85,0.92);
+  cursor: pointer;
+}
+
+/* ===== LIST WRAP ===== */
+.testsList{
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+/* mobile squeeze */
+@media (max-width: 420px){
+  .testsPage{ padding: 12px 12px 18px; }
+  .testsHero{ padding: 16px 14px; border-radius: 24px; }
+  .testsHeroTitle{ font-size: 32px; }
+  .testsHeroSub{ font-size: 15px; }
+  .testsAvailPill{ width: 100px; }
+  .testsHeroPig{ width: 100px; }
+}
+/* ===== RULE (фикс чтобы не разваливалось) ===== */
+.testsRuleCard{
+  display: block;
+}
+
+.testsRuleCard h1,
+.testsRuleCard h2,
+.testsRuleCard h3,
+.testsRuleCard h4,
+.testsRuleCard p{
+  margin: 0;
+}
+
+.testsRuleCard .cardTitle,
+.testsRuleCard .CardTitle,
+.testsRuleCard .card-title{
+  font-size: 18px;
+  font-weight: 950;
+  color: rgba(13,43,85,0.92);
+}
+
+.testsRuleCard .cardText,
+.testsRuleCard .CardText,
+.testsRuleCard .card-text{
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(13,43,85,0.55);
+  line-height: 1.25;
+}
+
+/* ряд с галкой + кнопкой */
+.testsRuleRow{
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testsRuleCheck{
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(123,200,164,0.18);
+  border: 1px solid rgba(123,200,164,0.35);
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* кнопка — принудительно норм */
+.testsGoLecturesBtn{
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(93,169,233,0.22) !important;
+  background: linear-gradient(180deg, rgba(234,244,255,0.98), rgba(255,255,255,0.94)) !important;
+  box-shadow: 0 12px 22px rgba(93,169,233,0.12) !important;
+  color: rgba(13,43,85,0.92) !important;
+
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 950;
+  cursor: pointer;
+  line-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.testsGoLecturesBtn:active{
+  transform: scale(0.985);
+}
+.testItemBtn{
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: block;
+}
+
+.testItemBtn.disabled{
+  cursor: not-allowed;
+}
+.testItemBtn:focus{
+  outline: none;
+}
+.testItemBtn:focus-visible .testItem{
+  box-shadow: 0 0 0 3px rgba(93,169,233,0.35), 0 12px 24px rgba(93,169,233,0.12);
+}
+
+.testItem{
+  display: grid;
+  grid-template-columns: 72px 1fr;   /* как в лекциях */
+  gap: 12px;
+  align-items: center;
+
+  padding: 12px;
+  border-radius: 20px;
+
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(93,169,233,0.20);
+  box-shadow: 0 12px 24px rgba(93,169,233,0.12);
+}
+
+.testItem.locked{
+  opacity: 0.72;
+}
+
+/* LEFT MEDIA (иконка) */
+.testItemMedia{
+  width: 72px;
+  height: 56px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(93,169,233,0.20);
+  background: rgba(255,255,255,0.78);
+  box-shadow: 0 8px 16px rgba(93,169,233,0.10);
+  display: grid;
+  place-items: center;
+}
+
+.testItemMedia img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* как в лекциях */
+  display: block;
+}
+
+/* RIGHT */
+.testItemLeft{
+  min-width: 0;
+}
+
+.testTitleRow{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.testTitle{
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: rgba(13,43,85,0.95);
+  min-width: 0;
+}
+
+.testTitlePrefix{
+  font-weight: 950;
+}
+
+.testBind{
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(13,43,85,0.52);
+}
+
+.testBind b{
+  color: rgba(13,43,85,0.92);
+  font-weight: 950;
+}
+
+/* status pill */
+.testStatusPill{
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(93,169,233,0.18);
+  background: rgba(255,255,255,0.82);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.testStatusPill.ok{
+  background: rgba(123,200,164,0.20);
+  border-color: rgba(123,200,164,0.32);
+}
+
+.testStatusPill.lock{
+  background: rgba(31,42,55,0.06);
+  border-color: rgba(31,42,55,0.14);
+  color: rgba(31,42,55,0.75);
+}
+
+.testStatusEmoji{ font-size: 14px; }
+
+/* questions pill */
+.testMetaPill{
+  margin-top: 10px;
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(93,169,233,0.18);
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 8px 18px rgba(93,169,233,0.10);
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(13,43,85,0.85);
+}
+
+/* divider */
+.testDivider{
+  height: 1px;
+  background: rgba(93,169,233,0.16);
+  margin: 12px 0;
+}
+
+/* bottom row */
+.testBottom{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testStartBtn{
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(93,169,233,0.20);
+  background: linear-gradient(180deg, rgba(234,244,255,0.98), rgba(255,255,255,0.94));
+  box-shadow: 0 12px 22px rgba(93,169,233,0.12);
+  font-size: 14px;
+  font-weight: 950;
+  color: rgba(13,43,85,0.92);
+  cursor: pointer;
+}
+
+.testStartBtn:active{ transform: scale(0.985); }
+
+.testStartBtn.disabled{
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.testHint{
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(13,43,85,0.45);
+}
+
+/* very small phones */
+@media (max-width: 360px){
+  .testItem{ grid-template-columns: 64px 1fr; }
+  .testItemMedia{ width: 64px; height: 50px; }
+  .testTitle{ font-size: 16px; }
+}
+/* ===== HERO доступно pill (меньше + иконка сверху) ===== */
+.testsAvailPill{
+  width: 96px;              /* было больше — делаем компактнее */
+  border-radius: 18px;
+  padding: 10px 10px;
+  background: rgba(255,255,255,0.86);
+  border: 1px solid rgba(170,210,255,0.55);
+  box-shadow: 0 14px 22px rgba(0,70,140,0.08);
+
+  display: grid;
+  justify-items: center;
+  row-gap: 6px;
+}
+
+.testsAvailTop{
+  display: grid;            /* вместо flex */
+  justify-items: center;
+  row-gap: 4px;
+
+  font-size: 12px;          /* меньше текст */
+  font-weight: 900;
+  color: rgba(13,43,85,0.72);
+  line-height: 1.05;
+  text-transform: lowercase;
+}
+
+.testsAvailIcon{
+  font-size: 20px;          /* иконка сверху */
+  line-height: 1;
+}
+
+.testsAvailNum{
+  margin-top: 0;
+  font-size: 20px;          /* чуть меньше */
+  font-weight: 950;
+  color: rgba(13,43,85,0.92);
+}
+
+/* мобилка ещё компактнее */
+@media (max-width: 420px){
+  .testsAvailPill{ width: 88px; padding: 9px 9px; border-radius: 16px; }
+  .testsAvailTop{ font-size: 11px; }
+  .testsAvailIcon{ font-size: 18px; }
+  .testsAvailNum{ font-size: 18px; }
+}

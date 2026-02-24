@@ -1,5 +1,6 @@
 import { Card, CardText, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
+import './lectures.css'
 
 type LectureStatus = 'locked' | 'available' | 'done'
 
@@ -8,6 +9,7 @@ type Lecture = {
   title: string
   description: string
   status: LectureStatus
+  image?: string // /img/lectures/xxx.png
 }
 
 type LecturesScreenProps = {
@@ -21,88 +23,105 @@ function badgeFor(status: LectureStatus) {
   return { text: 'Закрыто', cls: 'badge locked', icon: '🔒' }
 }
 
-function bubbleFor(status: LectureStatus) {
-  if (status === 'done') return { cls: 'lectureBubble done', icon: '🏁' }
-  if (status === 'available') return { cls: 'lectureBubble go', icon: '📘' }
-  return { cls: 'lectureBubble lock', icon: '🔒' }
-}
-
 export default function LecturesScreen({ lectures, onOpenLecture }: LecturesScreenProps) {
-  const doneCount = lectures.filter((l) => l.status === 'done').length
   const totalCount = lectures.length
+  const availableCount = lectures.filter((l) => l.status !== 'locked').length
 
   return (
     <div>
-      <div className="pageHead">
-        <div>
-          <h1>Лекции</h1>
-          <p>Выбирай тему и проходи шаг за шагом.</p>
-        </div>
-
-        <div className="pageHeadRight">
-          <div className="badge">
-            📚 {doneCount}/{totalCount}
+      {/* HERO */}
+      <div className="lecturesHero">
+        <div className="lecturesHeroRow">
+          <div>
+            <div className="lecturesHeroTitle">Лекции</div>
+            <div className="lecturesHeroSub">
+              Открываются по порядку. Проходи шаг за шагом — потом можно перейти к тесту.
+            </div>
           </div>
-          <img
-            src="/mascot-pig1.png"
-            width={54}
-            height={54}
-            alt=""
-            className="pageMascot"
-          />
+
+          <div className="lecturesHeroBadge">
+  <div className="lecturesHeroBadgeStack">
+    <img className="lecturesHeroIcon" src="/img/home/ic-lectures.png" alt="" />
+    <div className="lecturesCountPill">
+      <div className="lecturesCountTop">доступно</div>
+      <div className="lecturesCountValue">
+        {availableCount}/{totalCount}
+      </div>
+    </div>
+  </div>
+</div>
         </div>
       </div>
 
+      {/* RULE */}
+      <div className="mtop ruleCard">
+        <div className="ruleTitle">Правило</div>
+        <div className="ruleText">Сначала пройди лекцию → потом откроется следующая</div>
+        <div className="ruleOk">✅</div>
+
+        
+      </div>
+
+      {/* LIST */}
       <div className="stack mtop">
         {lectures.map((l) => {
           const b = badgeFor(l.status)
-          const bubble = bubbleFor(l.status)
           const locked = l.status === 'locked'
 
           return (
-            <Card
+            <button
               key={l.id}
-              className={`lectureCard ${locked ? 'lectureCardLocked' : 'accent'}`}
+              className="lectureItemBtn"
+              disabled={locked}
+              onClick={() => !locked && onOpenLecture(l.id)}
+              aria-label={locked ? `${l.title} недоступно` : `Открыть лекцию ${l.title}`}
             >
-              <div className="lectureTop">
-                <div className={bubble.cls} aria-hidden="true">
-                  {bubble.icon}
-                </div>
-
-                <div className="lectureInfo">
+              <Card className={`lectureItem ${locked ? 'locked' : ''} ${l.status === 'done' ? 'done' : ''}`}>
+                {/* LEFT */}
+                <div className="lectureItemLeft">
                   <div className="lectureTitleRow">
                     <CardTitle>{l.title}</CardTitle>
                     <span className={b.cls}>
                       {b.icon} {b.text}
                     </span>
                   </div>
-
-                  <CardText>{l.description}</CardText>
+                   <div className="lectureItemMedia" aria-hidden="true">
+                  {l.image ? (
+                    <img src={l.image} alt="" />
+                  ) : (
+                    <div className="lectureMediaPlaceholder">Тут будет картинка</div>
+                  )}
                 </div>
-              </div>
+                  <div className="lectureItemDesc">
+                    <CardText>{l.description}</CardText>
+                  </div>
 
-              <div className="lectureBottom">
-                <Button
-                  variant={locked ? 'ghost' : 'secondary'}
-                  disabled={locked}
-                  onClick={() => onOpenLecture(l.id)}
-                >
-                  {locked ? 'Недоступно' : l.status === 'done' ? 'Повторить' : 'Открыть'}
-                </Button>
+                  <div className="lectureBottom">
+                    <Button
+                      variant={locked ? 'ghost' : 'secondary'}
+                      disabled={locked}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (!locked) onOpenLecture(l.id)
+                      }}
+                    >
+                      {locked ? 'Недоступно' : l.status === 'done' ? 'Повторить' : 'Открыть'}
+                    </Button>
 
-                {!locked && (
-                  <span className="lectureHint">
-                    {l.status === 'done' ? 'Можно пройти ещё раз' : 'Сначала пройди — потом тест'}
-                  </span>
-                )}
+                    <span className="lectureHint">
+                      {locked
+                        ? 'Пройди предыдущую лекцию, чтобы открыть эту'
+                        : l.status === 'done'
+                          ? 'Можно пройти ещё раз'
+                          : 'Сначала пройди — потом тест'}
+                    </span>
+                  </div>
+                </div>
 
-                {locked && (
-                  <span className="lectureHint">
-                    Пройди предыдущую лекцию, чтобы открыть эту
-                  </span>
-                )}
-              </div>
-            </Card>
+                {/* RIGHT IMAGE */}
+                
+              </Card>
+            </button>
           )
         })}
       </div>

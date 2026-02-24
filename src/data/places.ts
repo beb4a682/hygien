@@ -9,4 +9,5 @@ export const PLACES: Place[] = [
   { id: 'bathroom', title: 'Ванная', hint: 'Где моют руки и чистят зубы.' },
   { id: 'classroom', title: 'Класс', hint: 'Парта, стул, вокруг.' },
   { id: 'street', title: 'Улица / двор', hint: 'Лавочка, площадка, подъезд.' },
+  { id: 'bedroom', title: 'Спальня', hint: 'Личная комната,кровать' },
 ]

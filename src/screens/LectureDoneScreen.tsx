@@ -1,107 +1,109 @@
-import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Card, CardTitle, CardText } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
+import type { Lecture } from '../data/lectures'
+import './lectureDone.css'
 
 type Props = {
-  title: string
-  onGoHome: () => void
-  onBackToLectures: () => void
+  lecture: Lecture
+  rewardXp?: number
   onGoTest: () => void
+  onGoLectures: () => void
 }
 
 export default function LectureDoneScreen({
-  title,
-  onGoHome,
-  onBackToLectures,
+  lecture,
+  rewardXp = 10,
   onGoTest,
+  onGoLectures,
 }: Props) {
   return (
-    <div>
-      <div className="pageHead">
-        <div>
-          <h1>Лекция пройдена 🎉</h1>
-          <p>Ты отлично справился. Маленький шаг — большой результат.</p>
+    <div className="lectureDonePage">
+      {/* HERO */}
+      <div className="lectureDoneHero">
+        <div className="lectureDoneHeroLeft">
+          <div className="lectureDoneTitle">
+            Лекция пройдена <span className="party">🎉</span>
+          </div>
+          <div className="lectureDoneSub">
+            Ты отлично справился. Маленький шаг — большой результат.
+          </div>
         </div>
 
-        <div className="pageHeadRight">
-          <span className="badge success">+10 XP</span>
-          <img
-            src="/mascot-pig.png"
-            width={56}
-            height={56}
-            alt=""
-            className="pageMascot"
-          />
-        </div>
+        
+
+        {/* пузыри */}
+        <img className="lectureDoneBubble b1" src="/img/home/bubble.png" alt="" />
+        <img className="lectureDoneBubble b2" src="/img/home/bubble.png" alt="" />
       </div>
 
-      {/* HERO */}
-      <Card className="mtop soft lectureDoneHero">
-        <div className="lectureDoneTop">
-          <div className="lectureDoneIcon" aria-hidden="true">📘</div>
+      {/* 🔹 МЕСТО ПОД КАРТИНКУ (между hero и карточкой лекции) */}
+      <div className="lectureDoneMidImage">
+        <img src="/src/assets/result-good.png" alt=""></img>
+      </div>
 
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="lectureDoneTitle">{title}</div>
-            <div className="lectureDoneSub">
+      {/* LECTURE CARD */}
+      <Card className="lectureDoneCard soft">
+        <div className="lectureDoneLectureRow">
+          <div className="lectureDoneLectureIcon">📘</div>
+
+          <div>
+            <div className="lectureDoneLectureTitle">{lecture.title}</div>
+            <div className="lectureDoneLectureSub">
               Лекция завершена и засчитана в прогресс
             </div>
           </div>
         </div>
-
-        <div className="lectureDoneStats">
-          <div className="miniCard">
-            <div className="sectionLabel">Награда</div>
-            <div className="statValue">+10 XP</div>
-          </div>
-
-          <div className="miniCard">
-            <div className="sectionLabel">Статус</div>
-            <div className="statValue">Пройдено ✅</div>
-          </div>
-        </div>
       </Card>
 
+      {/* STATS */}
+      <div className="lectureDoneStats">
+        <Card className="lectureDoneStat">
+          <div className="statLabel">НАГРАДА</div>
+          <div className="statValue">+{rewardXp} XP</div>
+        </Card>
+
+        <Card className="lectureDoneStat">
+          <div className="statLabel">СТАТУС</div>
+          <div className="statValue ok">Пройдено ✅</div>
+        </Card>
+      </div>
+
       {/* NEXT */}
-      <Card className="mtop accent">
+      <Card className="lectureDoneNext soft">
         <CardTitle>Что дальше?</CardTitle>
         <CardText>
           Можешь проверить себя в тесте или перейти к следующей лекции.
         </CardText>
 
-        <div className="stack" style={{ marginTop: 12 }}>
-          <Button onClick={onGoTest}>Пройти тест</Button>
-          <Button variant="secondary" onClick={onBackToLectures}>
+        <div className="lectureDoneActions">
+          <Button className="primary" onClick={onGoTest}>
+            Пройти тест
+          </Button>
+
+          <Button variant="secondary" onClick={onGoLectures}>
             К списку лекций
           </Button>
         </div>
       </Card>
 
-      {/* FOOT */}
-      <Card className="mtop">
-        <div className="lectureDoneFooter">
+      {/* TIP */}
+      <Card className="lectureDoneTip">
+        <div className="lectureDoneTipRow">
           <img
-            src="/mascot-pig2.png"
-            width={64}
-            height={64}
+            src="/src/assets/tip.png"
             alt=""
-            className="lectureDoneMascot"
+            className="lectureDoneTipPig"
           />
 
           <div>
-            <div style={{ fontWeight: 950 }}>
-              Совет
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>
-              Лучше проходить тест сразу после лекции — так знания запоминаются лучше 💡
+            <div className="lectureDoneTipTitle">Совет</div>
+            <div className="lectureDoneTipText">
+              Лучше проходить тест сразу после лекции — так знания
+              запоминаются лучше 💡
             </div>
           </div>
         </div>
       </Card>
-
-      <div className="row mtop">
-        <Button variant="ghost" onClick={onGoHome}>
-          На главную
-        </Button>
-      </div>
     </div>
   )
 }

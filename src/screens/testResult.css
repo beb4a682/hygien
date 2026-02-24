@@ -1,0 +1,84 @@
+.testResultPage {
+  padding: 12px;
+  padding-bottom: 18px;
+}
+
+/* HERO */
+.testResultHero {
+  position: relative;
+  border-radius: 20px;
+  padding: 16px;
+  overflow: hidden;
+
+  background: linear-gradient(180deg, #e8f4ff, #f8fcff);
+  border: 1px solid rgba(170, 210, 255, 0.55);
+}
+
+.testResultTitle {
+  font-size: 28px;
+  font-weight: 950;
+  color: #0d2b55;
+}
+
+.testResultSub {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(13, 43, 85, 0.6);
+}
+
+.testResultPill {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(170, 210, 255, 0.6);
+  font-weight: 950;
+  color: #0d2b55;
+}
+
+/* BUBBLES */
+.testResultBubble {
+  position: absolute;
+  opacity: 0.35;
+  width: 36px;
+  height: 36px;
+}
+.testResultBubble.b1 {
+  right: 20px;
+  bottom: 10px;
+}
+.testResultBubble.b2 {
+  right: 80px;
+  top: 40px;
+}
+
+/* IMAGE */
+.testResultImage {
+  margin: 14px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.testResultImage img {
+  max-width: 100%;
+  border-radius: 18px;
+}
+
+/* SCORE */
+.testResultScore {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 950;
+  color: #0d2b55;
+}
+
+/* ACTIONS */
+.testResultActions {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}

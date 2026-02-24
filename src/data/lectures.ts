@@ -8,6 +8,7 @@ export type Lecture = {
   minutes: number
   status: LectureStatus
   testId: string
+  image: string
 }
 
 // база (без status)
@@ -22,6 +23,7 @@ export const LECTURES: LectureBase[] = [
     tag: 'база',
     minutes: 3,
     testId: 'hands-test',
+    image: '/img/lectures/hands.png'
   },
   {
     id: 'teeth',
@@ -29,7 +31,8 @@ export const LECTURES: LectureBase[] = [
     description: 'Как ухаживать за зубами каждый день.',
     tag: 'ежедневно',
     minutes: 4,
-    testId: 'teeth-test',
+    testId: 'teeth',
+     image: '/img/lectures/teeth.png'
   },
   {
     id: 'shower',
@@ -37,7 +40,8 @@ export const LECTURES: LectureBase[] = [
     description: 'Зачем нужен душ и как заботиться о коже.',
     tag: 'гигиена',
     minutes: 4,
-    testId: 'shower-test',
+    testId: 'shower',
+     image: '/img/lectures/shower.png'
   },
   {
     id: 'clothes',
@@ -45,6 +49,7 @@ export const LECTURES: LectureBase[] = [
     description: 'Почему важно менять одежду и следить за чистотой.',
     tag: 'порядок',
     minutes: 3,
-    testId: 'clothes-test',
+    testId: 'clothes',
+     image: '/img/lectures/clothes.png'
   },
 ]

@@ -1,48 +1,77 @@
-import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Card } from '../components/ui/Card'
+import type { Place } from '../data/places'
+import type { PlaceId } from '../data/observationMissions'
+import './placePick.css'
 
-type Place = { id: string; title: string; desc?: string }
+const PLACE_ICONS: Record<string, string> = {
+  kitchen: '/img/places/kitchen.png',
+  bathroom: '/img/places/bathroom.png',
+  classroom: '/img/places/class.png',
+  street: '/img/places/street.png',
+  bedroom: '/img/places/badroom.png',
+}
 
 type Props = {
   places: Place[]
-  onPick: (placeId: string) => void
+  onPick: (placeId: PlaceId) => void
 }
 
 export default function PlacePickScreen({ places, onPick }: Props) {
   return (
-    <div>
-      <div className="pageHead">
-        <div>
-          <h1>Наблюдение</h1>
-          <p>Выбери место и оцени чистоту по пунктам.</p>
+    <div className="placePickPage">
+      {/* TOP BAR */}
+      
+
+      {/* HERO */}
+      <div className="placePickHero">
+        <div className="placePickHeroLeft">
+          <div className="placePickHeroTitle">Наблюдение</div>
+          <div className="placePickHeroSub">
+            Выбери место и оцени <br />
+            чистоту по пунктам.
+          </div>
         </div>
 
-        <div className="pageHeadRight">
-          <span className="badge">🧼 чек-лист</span>
-          <img src="/mascot-pig.png" width={54} height={54} alt="" className="pageMascot" />
-        </div>
+       
+        {/* bubbles */}
+        <img className="placePickBubble b1" src="/img/home/bubble.png" alt="" />
+        <img className="placePickBubble b2" src="/img/home/bubble.png" alt="" />
+        <img className="placePickBubble b3" src="/img/home/bubble.png" alt="" />
       </div>
 
-      <div className="stack mtop">
-        {places.map((p) => (
-          <Card key={p.id} className="accent placePickCard">
-            <button
-              className="placePickBtn"
-              onClick={() => onPick(p.id)}
-              style={{ width: '100%', textAlign: 'left' }}
-            >
-              <div className="placePickRow">
-                <div className="placePickBubble" aria-hidden="true">🏠</div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <CardTitle>{p.title}</CardTitle>
-                  <CardText>{p.desc ?? 'Оцени место и получи советы.'}</CardText>
+      {/* FRAME */}
+      <div className="placePickListWrap">
+        <Card className="placePickFrame">
+          <div className="placePickList">
+            {places.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className="placePickItem"
+                onClick={() => onPick(p.id as PlaceId)}
+              >
+                <div className="placePickIcon">
+                  <img src={PLACE_ICONS[p.id] ?? '/img/places/home.png'} alt="" />
                 </div>
 
-                <div className="placePickArrow">›</div>
-              </div>
-            </button>
-          </Card>
-        ))}
+                <div className="placePickText">
+                  <div className="placePickName">{p.title}</div>
+                  <div className="placePickHint">Оцени место и получи советы.</div>
+                </div>
+
+                <div className="placePickArrow" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+
+          <div className="placePickDots" aria-hidden="true">
+            <span />
+            <span />
+            <span className="active" />
+            <span />
+            <span />
+          </div>
+        </Card>
       </div>
     </div>
   )

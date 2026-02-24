@@ -1,4 +1,4 @@
-export type PlaceId = 'kitchen' | 'bathroom' | 'classroom' | 'street'
+export type PlaceId = 'kitchen' | 'bathroom' | 'classroom' | 'street' | 'bedroom'
 
 export type ObservationMission = {
   id: string
@@ -63,7 +63,8 @@ export const OBSERVATION_MISSIONS: ObservationMission[] = [
   { id: 'c_m1', placeId: 'classroom', criterionId: 'c1', title: 'Протри парту' },
   { id: 'c_m2', placeId: 'classroom', criterionId: 'c2', title: 'Убери мусор рядом' },
 
-  // --- street ---
-  { id: 's_m1', placeId: 'street', criterionId: 's1', title: 'Убери мусор рядом' },
-  { id: 's_m2', placeId: 'street', criterionId: 's5', title: 'Найди место без стекла и луж' },
+  // --- bedroom ---
+  { id: 'b_m1', placeId: 'bedroom', criterionId: 'b1', title: 'Заправь постель' },
+  { id: 's_m2', placeId: 'street', criterionId: 's5', title: 'Разбери рабочее место' },
+
 ]

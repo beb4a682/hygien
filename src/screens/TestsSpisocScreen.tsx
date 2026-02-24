@@ -1,20 +1,7 @@
-import { Card, CardText, CardTitle } from '../components/ui/Card'
-import { Button } from '../components/ui/Button'
-
-type LectureStatus = 'locked' | 'available' | 'done'
-type Lecture = {
-  id: string
-  title: string
-  description: string
-  status: LectureStatus
-}
-
-type Test = {
-  id: string
-  title: string
-  lectureId: string
-  questions: any[]
-}
+import { Card, CardTitle, CardText } from '../components/ui/Card'
+import type { Lecture } from '../data/lectures'
+import type { Test } from '../data/tests'
+import './tests.css'
 
 type Props = {
   lectures: Lecture[]
@@ -23,89 +10,147 @@ type Props = {
   onOpenTest: (testId: string) => void
 }
 
-function getLectureStatus(lectures: Lecture[], lectureId: string): LectureStatus {
-  return lectures.find((l) => l.id === lectureId)?.status ?? 'locked'
+function getLectureTitle(lectures: Lecture[], lectureId: string) {
+  return lectures.find((l) => l.id === lectureId)?.title ?? 'Лекция'
+}
+
+function isLectureDone(lectures: Lecture[], lectureId: string) {
+  return lectures.find((l) => l.id === lectureId)?.status === 'done'
 }
 
 export default function TestsSpisocScreen({ lectures, tests, onGoLectures, onOpenTest }: Props) {
-  const availableCount = tests.filter((t) => getLectureStatus(lectures, t.lectureId) === 'done').length
+  const total = tests.length
+  const available = tests.filter((t) => isLectureDone(lectures, t.lectureId)).length
 
   return (
-    <div>
-      <div className="pageHead">
-        <div>
-          <h1>Тесты</h1>
-          <p>Открываются после прохождения соответствующей лекции.</p>
+    <div className="testsPage">
+      {/* ===== HERO ===== */}
+      <div className="testsHero soft">
+        <div className="testsHeroText">
+          <div className="testsHeroTitle">Тесты</div>
+          <div className="testsHeroSub">
+            Открываются после прохождения
+            <br />
+            соответствующей лекции.
+          </div>
         </div>
 
-        <div className="pageHeadRight">
-          <div className="badge">
-            🧠 доступно {availableCount}/{tests.length}
+        <div className="testsHeroRight">
+          <div className="testsAvailPill">
+            <div className="testsAvailTop">
+              <span className="testsAvailIcon">🐷</span>
+              доступно
+            </div>
+            <div className="testsAvailNum">
+              {available}/{total}
+            </div>
           </div>
-          <img src="/mascot-pig.png" width={54} height={54} alt="" className="pageMascot" />
+
+          <img className="testsHeroPig" src="/img/home/ic-tests.png" alt="" />
         </div>
+
+        <img className="testsBubble b1" src="/img/home/bubble.png" alt="" />
+        <img className="testsBubble b2" src="/img/home/bubble.png" alt="" />
+        <img className="testsBubble b3" src="/img/home/bubble.png" alt="" />
+        <img className="testsBubble b4" src="/img/home/bubble.png" alt="" />
       </div>
 
-      <Card className="mtop soft">
+      {/* ===== RULE ===== */}
+      <Card className="testsRuleCard soft">
         <CardTitle>Правило</CardTitle>
-        <CardText>
-          Сначала пройди лекцию → потом откроется тест ✅
-        </CardText>
+        <CardText>Сначала пройди лекцию → потом откроется тест</CardText>
 
-        <div className="row" style={{ marginTop: 12 }}>
-          <Button variant="secondary" onClick={onGoLectures}>
+        <div className="testsRuleRow">
+          <span className="testsRuleCheck">✅</span>
+
+          <button className="testsGoLecturesBtn" type="button" onClick={onGoLectures}>
             Перейти к лекциям
-          </Button>
+          </button>
         </div>
       </Card>
 
-      <div className="stack mtop">
+      {/* ===== LIST ===== */}
+      <div className="testsList">
         {tests.map((t) => {
-          const status = getLectureStatus(lectures, t.lectureId)
-          const locked = status !== 'done'
-          const lectureTitle = lectures.find((l) => l.id === t.lectureId)?.title ?? 'Лекция'
+          const open = isLectureDone(lectures, t.lectureId)
+          const lectureTitle = getLectureTitle(lectures, t.lectureId)
+          const questionsCount = t.questions?.length ?? 0
 
           return (
-            <Card key={t.id} className={`testCard ${locked ? 'testCardLocked' : 'accent'}`}>
-              <div className="testTop">
-                <div className={`testBubble ${locked ? 'lock' : 'go'}`} aria-hidden="true">
-                  {locked ? '🔒' : '📝'}
+            <div
+              key={t.id}
+              className={`testItemBtn ${open ? '' : 'disabled'}`}
+              role="button"
+              tabIndex={0}
+              onClick={() => open && onOpenTest(t.id)}
+              onKeyDown={(e) => {
+                if (!open) return
+                if (e.key === 'Enter' || e.key === ' ') onOpenTest(t.id)
+              }}
+              aria-label={open ? `Открыть тест ${t.title}` : `${t.title} закрыт`}
+            >
+              <Card className={`testItem ${open ? '' : 'locked'} soft`}>
+                {/* LEFT ICON */}
+                <div className="testItemMedia" aria-hidden="true">
+                  <img src={(t as any).icon ?? '/img/tests/default.png'} alt="" />
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
+                {/* RIGHT CONTENT */}
+                <div className="testItemLeft">
                   <div className="testTitleRow">
-                    <CardTitle>{t.title}</CardTitle>
-                    <span className={`badge ${locked ? 'locked' : ''}`}>
-                      {locked ? '🔒 закрыто' : '✅ доступно'}
+                    <div className="testTitle">
+                      <span className="testTitlePrefix">Тест:</span> {t.title}
+                    </div>
+
+                    <span className={`testStatusPill ${open ? 'ok' : 'lock'}`}>
+                      {open ? (
+                        <>
+                          <span className="testStatusEmoji">✅</span> доступно
+                        </>
+                      ) : (
+                        <>
+                          <span className="testStatusEmoji">🔒</span> закрыто
+                        </>
+                      )}
                     </span>
                   </div>
 
-                  <div style={{ marginTop: 6, fontSize: 12, color: 'var(--muted2)', fontWeight: 850 }}>
-                    Привязан к лекции: <span style={{ color: 'var(--text)' }}>{lectureTitle}</span>
+                  <div className="testBind">
+                    Привязан к лекции: <b>{lectureTitle}</b>
                   </div>
 
-                  <div style={{ marginTop: 8 }}>
-                    <span className="chip">
-                      {t.questions?.length ?? 0} вопросов
-                    </span>
+                  <div className="testMetaPill">{questionsCount} вопросов</div>
+
+                  <div className="testDivider" />
+
+                  <div className="testBottom">
+                    {open ? (
+                      <>
+                        <button
+                          className="testStartBtn"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onOpenTest(t.id)
+                          }}
+                        >
+                          Начать
+                        </button>
+                        <div className="testHint">Удачи!</div>
+                      </>
+                    ) : (
+                      <>
+                        <button className="testStartBtn disabled" type="button" disabled>
+                          Недоступно
+                        </button>
+                        <div className="testHint">Сначала заверши лекцию</div>
+                      </>
+                    )}
                   </div>
                 </div>
-              </div>
-
-              <div className="testBottom">
-                <Button
-                  variant={locked ? 'ghost' : 'secondary'}
-                  disabled={locked}
-                  onClick={() => onOpenTest(t.id)}
-                >
-                  {locked ? 'Недоступно' : 'Начать'}
-                </Button>
-
-                <span className="testHint">
-                  {locked ? 'Сначала заверши лекцию' : 'Удачи!'}
-                </span>
-              </div>
-            </Card>
+              </Card>
+            </div>
           )
         })}
       </div>

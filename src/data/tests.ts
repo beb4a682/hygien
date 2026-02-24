@@ -12,6 +12,7 @@ export type Test = {
   title: string
   description: string
   questions: TestQuestion[]
+ icon?: string 
 }
 
 export const TESTS: Test[] = [
@@ -20,6 +21,7 @@ export const TESTS: Test[] = [
     lectureId: 'hands',
     title: 'Тест: Мытьё рук',
     description: 'Проверим, когда и как правильно мыть руки.',
+    icon: '/img/lectures/hands.png',
     questions: [
       {
         id: 'hands-q1',
@@ -58,6 +60,7 @@ export const TESTS: Test[] = [
         explanation: 'Если руки видимо грязные, мыло помогает лучше убрать грязь и микробы.',
       },
     ],
+    
   },
 
   {
@@ -65,6 +68,7 @@ export const TESTS: Test[] = [
     lectureId: 'teeth',
     title: 'Тест: Чистка зубов',
     description: 'Проверим базовые правила ухода за зубами.',
+    icon: '/img/lectures/teeth.png',
     questions: [
       {
         id: 'teeth-q1',
@@ -109,6 +113,7 @@ export const TESTS: Test[] = [
     lectureId: 'shower',
     title: 'Тест: Душ и чистота тела',
     description: 'Проверим правила ухода за кожей.',
+    icon: '/img/lectures/shower.png',
     questions: [
       {
         id: 'shower-q1',
@@ -153,6 +158,7 @@ export const TESTS: Test[] = [
     lectureId: 'clothes',
     title: 'Тест: Одежда и обувь',
     description: 'Проверим правила чистой одежды и обуви дома.',
+    icon: '/img/lectures/clothes.png',
     questions: [
       {
         id: 'clothes-q1',

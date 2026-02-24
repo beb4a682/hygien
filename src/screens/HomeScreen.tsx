@@ -1,13 +1,14 @@
+import { useMemo, useState } from 'react'
 import { Card, CardTitle, CardText } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import {
-  ACHIEVEMENTS,
   type AchievementId,
   type ProfileState,
   xpProgress,
   roleTitle,
 } from '../data/progression'
 import type { TodayMission } from '../App'
+import './home.css'
 
 type HomeScreenProps = {
   onGoLectures: () => void
@@ -20,8 +21,8 @@ type HomeScreenProps = {
   eventMissions: TodayMission[]
   onCompleteMission: (uid: string) => void
 
-  achievements: AchievementId[]
-  onOpenAchievement: (id: AchievementId) => void
+  achievements: AchievementId[] // оставляем в пропсах, но на главной НЕ показываем
+  onOpenAchievement: (id: AchievementId) => void // тоже не используем на главной
 }
 
 export default function HomeScreen({
@@ -32,225 +33,189 @@ export default function HomeScreen({
   dailyMission,
   eventMissions,
   onCompleteMission,
-  achievements,
-  onOpenAchievement,
 }: HomeScreenProps) {
-  const { value, need } = xpProgress(profile)
-  const percent = profile.roleLevel >= 10 ? 100 : Math.min(100, (value / need) * 100)
+ const { value, need } = xpProgress(profile)
 
-  const unlockedCount = achievements.length
-  const totalCount = ACHIEVEMENTS.length
+// у тебя уровень — roleLevel, и MAX после 10
+const percent = profile.roleLevel >= 10 ? 100 : Math.min(100, Math.round((value / Math.max(1, need)) * 100))
 
-  const renderMission = (m: TodayMission) => (
-    <div
-      key={m.uid}
-      className="miniCard"
-      style={{
-        opacity: m.done ? 0.65 : 1,
-      }}
-    >
-      <div style={{ fontWeight: 950, letterSpacing: '-0.01em' }}>{m.text}</div>
+const role = useMemo(() => roleTitle(profile.roleLevel), [profile.roleLevel])
+  // “подсветка при тапе” как на макете
+  const [pressed, setPressed] = useState<null | 'lectures' | 'tests' | 'obs'>(null)
 
-      <div className="row" style={{ marginTop: 10 }}>
-        <Button disabled={m.done} onClick={() => onCompleteMission(m.uid)}>
-          {m.done ? 'Выполнено ✅' : 'Выполнил (+5 XP)'}
-        </Button>
-      </div>
-    </div>
-  )
+  const tap = (key: 'lectures' | 'tests' | 'obs', fn: () => void) => {
+    setPressed(key)
+    // чтобы успела отрисоваться активная заливка, потом переход
+    requestAnimationFrame(() => fn())
+    // если пользователь вернётся назад — не держим активной
+    setTimeout(() => setPressed(null), 300)
+  }
 
   return (
-    <div>
-      {/* Header with mascot */}
-      <div className="row" style={{ gap: 12, alignItems: 'center' }}>
-        <img
-          src="/mascot-pig.png"
-          width={56}
-          height={56}
-          alt=""
-          style={{
-            objectFit: 'contain',
-            filter: `
-              drop-shadow(0 6px 12px rgba(93,169,233,0.25))
-              drop-shadow(0 0 16px rgba(93,169,233,0.18))
-            `,
-          }}
-        />
-        <div>
-          <h1>Hygiene Level Up</h1>
-          <div style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 800, marginTop: 4 }}>
-            Давай сделаем день чище ✨
-          </div>
+    <div className="home">
+      {/* HERO */}
+      <div className="hero">
+        {/* сюда вставишь PNG со свинкой/пузыриками */}
+        {/* ВАРИАНТ 1: фон-баннер */}
+        {/* <img className="hero-bg" src="/img/home/hero.png" alt="" /> */}
+
+        <div className="hero-left">
+          {/* PNG свинки слева */}
+          <img className="hero-mascot" src="/img/home/pig-hero.png" alt="Маскот" />
         </div>
+
+        <div className="hero-right">
+          <div className="hero-title">Hygiene Level Up</div>
+          <div className="hero-subtitle">Давай сделаем день чище ✨</div>
+        </div>
+
+        {/* пузыри декоративно (по желанию) */}
+        <img className="hero-bubble b1" src="/img/home/bubble.png" alt="" />
+        <img className="hero-bubble b2" src="/img/home/bubble.png" alt="" />
       </div>
 
-      {/* PROGRESS */}
-      <Card className="mtop soft">
+      {/* ПРОГРЕСС */}
+      <Card className="home-card">
         <CardTitle>Твой прогресс</CardTitle>
 
-        <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-          <div style={{ display: 'grid', gap: 6 }}>
-            <div className="sectionLabel">Роль</div>
-            <div style={{ fontWeight: 950 }}>{roleTitle(profile.roleLevel)}</div>
+        <div className="progress-grid">
+          <div className="progress-col">
+            <div className="label">РОЛЬ</div>
+            <div className="value">{role}</div>
+
+            <div className="label" style={{ marginTop: 10 }}>
+              УРОВЕНЬ
+            </div>
+            <div className="value">{profile.roleLevel}</div>
           </div>
 
-          <div style={{ display: 'grid', gap: 6 }}>
-            <div className="sectionLabel">Уровень</div>
-            <div style={{ fontWeight: 950 }}>{profile.roleLevel}</div>
-          </div>
-
-          <div>
-            <div className="sectionLabel">XP</div>
-
-            <div className="progress" style={{ marginTop: 8 }}>
-              <div className="progressFill" style={{ width: `${percent}%` }} />
+          <div className="progress-bar-wrap">
+            <div className="progress-bar">
+              <div className="progress-bar-fill" style={{ width: `${percent}%` }} />
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: 10,
-                gap: 10,
-              }}
-            >
-              <div className="xpChip">
-                <span className="xpDot" />
-                {profile.roleLevel >= 10 ? 'MAX' : `${value} / ${need} XP`}
+            <div className="progress-bottom">
+              <div className="xp-pill">
+                <span className="dot" />
+                {value} / {need} XP
               </div>
-
-              <div style={{ fontSize: 12, color: 'var(--muted2)', fontWeight: 950 }}>
-                {Math.round(percent)}%
-              </div>
+              <div className="percent">{percent}%</div>
             </div>
           </div>
         </div>
       </Card>
 
-      {/* NAV */}
-      <div className="row mtop">
-        <Button variant="secondary" onClick={onGoLectures}>
-          Лекции
-        </Button>
-        <Button variant="secondary" onClick={onGoTests}>
-          Тесты
-        </Button>
-        <Button variant="secondary" onClick={onGoPlaceObservation}>
-          Наблюдение
-        </Button>
-      </div>
+      {/* НАВИГАЦИЯ-КНОПКИ */}
+<div className="nav-pills">
+  <button
+    className={`pill ${pressed === 'lectures' ? 'active' : ''}`}
+    onMouseDown={() => setPressed('lectures')}
+    onTouchStart={() => setPressed('lectures')}
+    onClick={() => tap('lectures', onGoLectures)}
+    type="button"
+  >
+    <img className="pill-ic" src="/img/home/ic-lectures.png" alt="" />
+    Лекции
+  </button>
 
-      {/* ACHIEVEMENTS GRID */}
-      <Card className="mtop">
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'baseline' }}>
-          <CardTitle>Достижения</CardTitle>
-          <div className="badge">
-            {unlockedCount} / {totalCount}
-          </div>
-        </div>
+  <button
+    className={`pill ${pressed === 'tests' ? 'active' : ''}`}
+    onMouseDown={() => setPressed('tests')}
+    onTouchStart={() => setPressed('tests')}
+    onClick={() => tap('tests', onGoTests)}
+    type="button"
+  >
+    <img className="pill-ic" src="/img/home/ic-tests.png" alt="" />
+    Тесты
+  </button>
+</div>
 
-        <CardText>Собирай коллекцию — открывай новые бейджи.</CardText>
-        <div className="divider" />
+<div className="nav-obs">
+  <button
+    className={`pill pill-obs ${pressed === 'obs' ? 'active' : ''}`}
+    onMouseDown={() => setPressed('obs')}
+    onTouchStart={() => setPressed('obs')}
+    onClick={() => tap('obs', onGoPlaceObservation)}
+    type="button"
+  >
+    <img className="pill-ic" src="/img/home/ic-obs.png" alt="" />
+    Наблюдение
+  </button>
+</div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {ACHIEVEMENTS.map((a) => {
-            const unlocked = achievements.includes(a.id)
-
-            return (
-              <button
-                key={a.id}
-                onClick={() => onOpenAchievement(a.id)}
-                style={{
-                  textAlign: 'left',
-                  padding: 14,
-                  borderRadius: 16,
-                  border: '1px solid rgba(93,169,233,0.16)',
-                  background: unlocked ? 'rgba(255,255,255,0.92)' : 'rgba(31,42,55,0.06)',
-                  opacity: unlocked ? 1 : 0.62,
-                  cursor: 'pointer',
-                  boxShadow: unlocked ? '0 10px 22px rgba(93,169,233,0.14)' : 'none',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                <div style={{ fontWeight: 950, fontSize: 13 }}>
-                  {unlocked ? '🏆 ' : '🔒 '}
-                  {a.title}
-                </div>
-
-                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{a.desc}</div>
-
-                {unlocked && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background:
-                        'radial-gradient(220px 140px at 80% 0%, rgba(93,169,233,0.18), transparent 55%)',
-                      pointerEvents: 'none',
-                    }}
-                  />
-                )}
-              </button>
-            )
-          })}
-        </div>
-      </Card>
-
-      {/* MISSIONS */}
-      <Card className="mtop accent">
+      {/* МИССИИ */}
+      <Card className="home-card">
         <CardTitle>Миссии</CardTitle>
 
-        <div style={{ marginTop: 12 }}>
-          <div className="sectionLabel">Дневная</div>
+        {/* ДНЕВНАЯ */}
+        <div className="missions-section">
+          <div className="section-label">ДНЕВНАЯ</div>
 
-          <div style={{ marginTop: 10, display: 'grid', gap: 10 }}>
-            {dailyMission ? (
-              renderMission(dailyMission)
-            ) : (
-              <div className="miniCard soft" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <img src="/mascot-pig-thinking.png" width={52} height={52} alt="" />
-                <div>
-                  <div style={{ fontWeight: 950 }}>Пока нет дневной миссии</div>
-                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
-                    Скоро появится новая задачка 💙
-                  </div>
-                </div>
+          {dailyMission ? (
+            <div className="mission-big">
+              <img
+                className="mission-big-img"
+                src="/img/missions/pig-mission.png"
+                alt=""
+              />
+
+              <div className="mission-big-body">
+                <div className="mission-big-title">{dailyMission.text}</div>
+
+                <Button
+                  className="mission-btn"
+                  disabled={dailyMission.done}
+                  onClick={() => onCompleteMission(dailyMission.uid)}
+                >
+                  {dailyMission.done ? 'Выполнено ✅' : 'Выполнил (+5 XP)'}
+                </Button>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            // как у тебя было в коде — оставляем заглушку если миссии нет
+           <CardText>
+            <span className="muted">Сегодня дневной миссии пока нет 🙂</span>
+          </CardText>
+          )}
         </div>
 
-        <div style={{ marginTop: 16 }}>
-          <div className="sectionLabel">После действий</div>
+        {/* ПОСЛЕ ДЕЙСТВИЙ */}
+        <div className="missions-section" style={{ marginTop: 14 }}>
+          <div className="section-label">ПОСЛЕ ДЕЙСТВИЙ</div>
 
-          <div style={{ marginTop: 10, display: 'grid', gap: 10 }}>
-            {eventMissions.length > 0 ? (
-              eventMissions.map(renderMission)
-            ) : (
-              <div className="miniCard soft" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <img
-                  src="/mascot-pig-thinking.png"
-                  width={56}
-                  height={56}
-                  alt=""
-                  style={{
-                    objectFit: 'contain',
-                    filter: `
-                      drop-shadow(0 6px 12px rgba(93,169,233,0.22))
-                    `,
-                  }}
-                />
-                <div>
-                  <div style={{ fontWeight: 950 }}>Тут будут миссии</div>
-                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
-                    Пройди лекцию, тест или наблюдение — и появятся задания.
+          {eventMissions?.length ? (
+            <div className="missionsGrid">
+              {eventMissions.slice(0, 4).map((m, idx) => (
+                <button
+                  key={m.uid}
+                  className="mission-small"
+                  onClick={() => onCompleteMission(m.uid)}
+                  type="button"
+                  disabled={m.done}
+                  style={{ opacity: m.done ? 0.65 : 1 }}
+                >
+                  <div className="mission-small-title">{m.text}</div>
+
+                  <div className="mission-small-bottom">
+                    <div className="mission-small-pill">{m.done ? 'Выполнено ✅' : 'Выполнил (+5 XP)'}</div>
+
+                    {/* картинка справа — под каждую можешь сделать отдельную,
+                        или одну общую, или по idx выбирать */}
+                    <img
+                      className="mission-small-img"
+                      src={`/img/missions/after.png`}
+                      alt=""
+                    />
                   </div>
-                </div>
-              </div>
-            )}
-          </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            // если нет — оставляем как раньше (или короткая заглушка)
+            <CardText>
+              <span className="muted">Пока нет миссий после действий.</span>
+            </CardText>
+          )}
         </div>
       </Card>
     </div>

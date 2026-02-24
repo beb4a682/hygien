@@ -360,18 +360,26 @@ function App() {
 
        {screen === 'profile' && (
   <ProfileScreen
-    profile={profile}
-    onChangeName={(name) => {
-      updateProfile((p) => ({
-        ...p,
-        name,
-      }))
-      setNotification({
-        text: `✅ Имя сохранено: ${name}`,
-        actionLabel: 'Ок',
-        onAction: () => setNotification(null),
-      })
-    }}
+      profile={profile}
+      achievements={profile.achievements ?? []}
+      onOpenAchievement={(id) => {
+        setNotification({
+          text: `🏆 ${id}`,
+          actionLabel: 'Ок',
+          onAction: () => setNotification(null),
+        })
+      }}
+      onChangeName={(name) => {
+        updateProfile((p) => ({
+          ...p,
+          name,
+        }))
+        setNotification({
+          text: `✅ Имя сохранено: ${name}`,
+          actionLabel: 'Ок',
+          onAction: () => setNotification(null),
+        })
+      }}
     onReset={() => {
       if (!confirm('Сбросить весь прогресс?')) return
 
@@ -426,16 +434,12 @@ function App() {
 
         {screen === 'lectureDone' && selectedLecture && (
           <LectureDoneScreen
-            title={selectedLecture.title}
-            onGoHome={() => {
-              setScreen('home')
+            lecture={selectedLecture}
+            onGoLectures={() => {
+              setScreen('lectures')
               setSelectedLectureId(null)
             }}
-            onBackToLectures={() => setScreen('lectures')}
-            onGoTest={() => {
-              setTestScore(null)
-              setScreen('testsList')
-            }}
+            onGoTest={() => setScreen('testView')}
           />
         )}
 

@@ -1,0 +1,106 @@
+/* ===== Achievements carousel ===== */
+
+.achHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.achCarousel {
+  position: relative;
+  margin-top: 10px;
+}
+
+.achTrack {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 8px 40px; /* место под стрелки */
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.achTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.achCard {
+  flex: 0 0 240px;
+  text-align: left;
+
+  padding: 12px;
+  border-radius: 18px;
+
+  border: 1px solid rgba(93, 169, 233, 0.16);
+  background: rgba(255, 255, 255, 0.92);
+
+  box-shadow: 0 10px 22px rgba(93, 169, 233, 0.12);
+  cursor: pointer;
+
+  scroll-snap-align: start;
+  overflow: hidden;
+  position: relative;
+}
+
+.achCard.locked {
+  background: rgba(31, 42, 55, 0.06);
+  opacity: 0.72;
+  box-shadow: none;
+}
+
+.achImg {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+.achTitle {
+  margin-top: 10px;
+  font-weight: 950;
+  font-size: 14px;
+}
+
+.achDesc {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.achArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(93, 169, 233, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+
+  font-size: 22px;
+  font-weight: 950;
+  color: rgba(13, 43, 85, 0.75);
+
+  display: grid;
+  place-items: center;
+
+  box-shadow: 0 10px 22px rgba(93, 169, 233, 0.12);
+  cursor: pointer;
+}
+
+.achArrow.left {
+  left: 6px;
+}
+
+.achArrow.right {
+  right: 6px;
+}
+
+.achArrow:active {
+  transform: translateY(-50%) scale(0.98);
+}

@@ -1,0 +1,400 @@
+/* глобально для этого экрана */
+.home, .home * {
+  box-sizing: border-box;
+}
+/* ==== HARD FIX: миссии не вылезают, всегда влезают в Card ==== */
+
+/* на всякий случай — запрещаем горизонтальный вылет на странице */
+html, body { max-width: 100%; overflow-x: hidden; }
+.home { max-width: 100%; overflow-x: hidden; }
+.home-card { width: 100%; max-width: 100%; box-sizing: border-box; }
+
+/* фиксируем сетку миссий: поддерживаем оба класса */
+.mission-grid,
+.missionsGrid{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin: 0;           /* важно */
+  padding: 0;          /* важно */
+}
+
+/* карточки в сетке НЕ раздувают ширину */
+.mission-small{
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* текст НЕ раздвигает карточку */
+.mission-small-title{
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+/* на всякий — убираем горизонтальный вылет */
+.home {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.home {
+  padding: 12px;
+  padding-bottom: 18px;
+}
+
+.home-card {
+  margin-top: 12px;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 14px;
+  border-radius: 18px;
+
+  background: linear-gradient(180deg, rgba(230, 244, 255, 1), rgba(245, 250, 255, 1));
+  border: 1px solid rgba(170, 210, 255, 0.55);
+
+  overflow: hidden;
+}
+
+.hero-left {
+  width: 74px;
+  flex: 0 0 74px;
+}
+
+.hero-mascot {
+  width: 74px;
+  height: 74px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(0, 60, 120, 0.12));
+}
+
+.hero-right {
+  min-width: 0;
+}
+
+.hero-title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  color: #0d2b55;
+  line-height: 1.05;
+}
+
+.hero-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(13, 43, 85, 0.7);
+}
+
+.hero-bubble {
+  position: absolute;
+  opacity: 0.45;
+  width: 36px;
+  height: 36px;
+}
+
+.hero-bubble.b1 {
+  right: 18px;
+  top: 10px;
+}
+
+.hero-bubble.b2 {
+  right: 60px;
+  bottom: 10px;
+  width: 26px;
+  height: 26px;
+}
+
+/* ПРОГРЕСС */
+.progress-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: rgba(13, 43, 85, 0.55);
+}
+
+.value {
+  font-size: 18px;
+  font-weight: 900;
+  color: #0d2b55;
+  margin-top: 2px;
+}
+
+.progress-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(176, 210, 245, 0.45);
+  overflow: hidden;
+  border: 1px solid rgba(140, 190, 245, 0.55);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(65, 160, 255, 1), rgba(120, 210, 255, 1));
+}
+
+.progress-bottom {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.xp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 10px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(160, 210, 255, 0.6);
+  color: rgba(13, 43, 85, 0.85);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.xp-pill .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(65, 160, 255, 1);
+}
+
+.percent {
+  font-weight: 900;
+  color: rgba(13, 43, 85, 0.65);
+}
+
+/* КНОПКИ-НАВИГАЦИЯ */
+.nav-pills {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.nav-obs{
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.pill-obs{
+  width: min(280px, 100%);
+}
+
+.pill {
+  border: 1px solid rgba(160, 210, 255, 0.7);
+  background: rgba(245, 250, 255, 0.92);
+  border-radius: 999px;
+
+  padding: 10px 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  font-weight: 900;
+  color: rgba(13, 43, 85, 0.85);
+
+  box-shadow: 0 8px 18px rgba(0, 70, 140, 0.08);
+  transition: 
+  transform 0.06s ease, background 0.12s ease, border-color 0.12s ease;
+}
+.pill{
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.pill:active {
+  transform: scale(0.98);
+}
+
+.pill-ic {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* активное состояние — как “Лекции” на макете */
+.pill.active {
+  background: linear-gradient(180deg, rgba(75, 175, 255, 1), rgba(40, 135, 255, 1));
+  border-color: rgba(30, 120, 235, 0.9);
+  color: #fff;
+}
+
+/* МИССИИ */
+.missions-section {
+  margin-top: 12px;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: rgba(13, 43, 85, 0.55);
+  margin-bottom: 8px;
+}
+
+/* ДНЕВНАЯ большая карточка */
+.mission-big {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 12px;
+
+  padding: 12px;
+  border-radius: 16px;
+
+  background: rgba(245, 250, 255, 0.9);
+  border: 1px solid rgba(160, 210, 255, 0.6);
+}
+
+.mission-big-img {
+  width: 74px;
+  height: 74px;
+  object-fit: contain;
+}
+.missionCard{
+  width: 100%;
+  box-sizing: border-box;   /* ОБЯЗАТЕЛЬНО */
+}
+.mission-big-title {
+  font-weight: 900;
+  color: rgba(13, 43, 85, 0.9);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.mission-btn {
+  margin-top: 10px;
+  border-radius: 999px !important;
+}
+
+/* ПОСЛЕ ДЕЙСТВИЙ сетка */
+.missionsGrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  width: 100%;
+  box-sizing: border-box;
+  
+  margin-left: auto;
+  margin-right: auto;
+
+  max-width: calc(100% - 0px); /* не даём шире экрана */
+  box-sizing: border-box;
+
+
+}
+
+.mission-small {
+  width: 100%;
+  text-align: left;
+
+  padding: 10px 10px;
+  border-radius: 16px;
+
+  background: rgba(245, 250, 255, 0.9);
+  border: 1px solid rgba(160, 210, 255, 0.6);
+
+  box-shadow: 0 8px 18px rgba(0, 70, 140, 0.06);
+}
+
+.mission-small:active {
+  transform: scale(0.99);
+}
+
+.mission-small-title {
+  font-weight: 900;
+  color: rgba(13, 43, 85, 0.9);
+  font-size: 14px;
+  line-height: 1.2;
+  min-height: 34px;
+}
+
+.mission-small-bottom {
+  margin-top: 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mission-small-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+
+  background: linear-gradient(180deg, rgba(95, 195, 255, 1), rgba(55, 155, 255, 1));
+  color: white;
+  font-weight: 900;
+  font-size: 11px;
+}
+
+.mission-small-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex: 0 0 44px;
+}
+
+.muted {
+  color: rgba(13, 43, 85, 0.55);
+}
+.mission-small:disabled {
+  cursor: default;
+}
+.missionsPage,
+.observationPage,
+.homePage{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* защита от вылезаний */
+}
+/* ===== FIX: центрируем миссии и убираем вылет вправо ===== */
+
+/* на всякий случай — карточки точно не расширяют сетку */
+.mission-small{
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.home{
+  overflow-x: hidden;
+}

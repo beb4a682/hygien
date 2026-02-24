@@ -1,5 +1,6 @@
-import { Card, CardText, CardTitle } from '../components/ui/Card'
+import { Card, CardTitle, CardText } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
+import './testResult.css'
 
 type Props = {
   score: number
@@ -8,63 +9,87 @@ type Props = {
   onGoHome: () => void
 }
 
+// 🖼 картинки по результату
+const RESULT_IMAGES = {
+  bad: '/src/assets/result-bad.png',
+  ok: '/src/assets/result-badmid.png',
+  good: '/src/assets/result-mid.png',
+  perfect: '/src/assets/result-good.png',
+}
+
+function getResultImage(score: number, total: number) {
+  const percent = total === 0 ? 0 : (score / total) * 100
+
+  if (percent <= 25) return RESULT_IMAGES.bad
+  if (percent <= 50) return RESULT_IMAGES.ok
+  if (percent <= 75) return RESULT_IMAGES.good
+  return RESULT_IMAGES.perfect
+}
+
+function getResultText(score: number, total: number) {
+  const percent = total === 0 ? 0 : (score / total) * 100
+
+  if (percent <= 25) return 'Ничего страшного — попробуем ещё 💙'
+  if (percent <= 50) return 'Уже неплохо! Можно лучше 🙂'
+  if (percent <= 75) return 'Отличный результат! 💪'
+  return 'Идеально! Ты просто супер 🌟'
+}
+
 export default function TestResultScreen({
   score,
   maxScore,
-  onTryAgain,
-  onGoHome,
+onTryAgain,
+onGoHome
 }: Props) {
-  const ratio = maxScore === 0 ? 0 : score / maxScore
-  const percent = Math.round(ratio * 100)
-
-  const mood =
-    ratio >= 1
-      ? { t: 'Идеально! 🔥', s: 'Ты всё усвоил. Отличная работа!' }
-      : ratio >= 0.8
-      ? { t: 'Очень хорошо 💙', s: 'Почти без ошибок — супер!' }
-      : ratio >= 0.6
-      ? { t: 'Неплохо 👍', s: 'Есть над чем поработать.' }
-      : { t: 'Стоит повторить 🙂', s: 'Попробуй ещё раз после лекции.' }
+  const percent = Math.round((score / maxScore) * 100)
+  const resultImage = getResultImage(score, maxScore)
+  const resultText = getResultText(score, maxScore)
 
   return (
-    <div>
-      <div className="pageHead">
+    <div className="testResultPage">
+      {/* HERO */}
+      <div className="testResultHero">
         <div>
-          <h1>Результат теста</h1>
-          <p>{mood.t}</p>
+          <div className="testResultTitle">Тест завершён</div>
+          <div className="testResultSub">{resultText}</div>
         </div>
 
-        <div className="pageHeadRight">
-          <span className="badge success">{percent}%</span>
-          <img src="/mascot-pig2.png" width={54} height={54} alt="" className="pageMascot" />
+        <div className="testResultPill">
+          {score} / {maxScore}
         </div>
+
+        {/* пузыри */}
+        <img className="testResultBubble b1" src="/img/home/bubble.png" alt="" />
+        <img className="testResultBubble b2" src="/img/home/bubble.png" alt="" />
       </div>
 
-      {/* SCORE */}
-      <Card className="mtop soft">
+      {/* 🖼 КАРТИНКА ПО РЕЗУЛЬТАТУ */}
+      <div className="testResultImage">
+        <img src={resultImage} alt="" />
+      </div>
+
+      {/* RESULT CARD */}
+      <Card className="soft">
         <CardTitle>Твой результат</CardTitle>
-        <CardText>{mood.s}</CardText>
 
-        <div className="testScore">
-          <div className="testScoreValue">
-            {score} / {maxScore}
-          </div>
-
-          <div className="progress">
-            <div className="progressFill" style={{ width: `${percent}%` }} />
-          </div>
+        <div className="testResultScore">
+          {percent}% правильных ответов
         </div>
+
+        <CardText>
+          Ты ответил правильно на <b>{score}</b> из <b>{maxScore}</b> вопросов.
+        </CardText>
       </Card>
 
       {/* ACTIONS */}
-      <Card className="mtop accent">
+      <Card className="soft">
         <CardTitle>Что дальше?</CardTitle>
-        <CardText>Закрепи результат или иди дальше 🚀</CardText>
+        <CardText>Можешь попробовать ещё раз или вернуться на главную</CardText>
 
-        <div className="stack" style={{ marginTop: 12 }}>
-          <Button onClick={onGoHome}>На главную</Button>
-          <Button variant="secondary" onClick={onTryAgain}>
-            Пройти ещё раз
+        <div className="testResultActions">
+          <Button onClick={onTryAgain}>Пройти ещё раз</Button>
+          <Button variant="secondary" onClick={onGoHome}>
+            На главную
           </Button>
         </div>
       </Card>
