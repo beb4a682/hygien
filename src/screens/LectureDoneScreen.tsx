@@ -76,9 +76,7 @@ export default function LectureDoneScreen({
         </CardText>
 
         <div className="lectureDoneActions">
-          <Button className="primary" onClick={onGoTest}>
-            Пройти тест
-          </Button>
+          
 
           <Button variant="secondary" onClick={onGoLectures}>
             К списку лекций
@@ -90,7 +88,7 @@ export default function LectureDoneScreen({
       <Card className="lectureDoneTip">
         <div className="lectureDoneTipRow">
           <img
-            src="/src/assets/tip.png"
+            src="/img/lectures/tip.png"
             alt=""
             className="lectureDoneTipPig"
           />

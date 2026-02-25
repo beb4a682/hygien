@@ -52,4 +52,22 @@ export const LECTURES: LectureBase[] = [
     testId: 'clothes',
      image: '/img/lectures/clothes.png'
   },
+  {
+  id: 'food',
+  title: 'Гигиена еды',
+  description: 'Почему важно мыть руки, продукты и есть в чистоте.',
+  tag: 'еда',
+  minutes: 4,
+  testId: 'food',
+  image: '/img/lectures/food.png'
+},
+{
+  id: 'sleep',
+  title: 'Здоровый сон',
+  description: 'Как сон помогает организму и как правильно готовиться ко сну.',
+  tag: 'сон',
+  minutes: 4,
+  testId: 'sleep',
+  image: '/img/lectures/sleep.png'
+}
 ]

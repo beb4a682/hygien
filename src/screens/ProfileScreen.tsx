@@ -60,7 +60,7 @@ export default function ProfileScreen({
     <div>
       <div className="row" style={{ gap: 12, alignItems: 'center' }}>
         <img
-          src="src/assets/mascot-pig.png"
+          src="/src/assets/mascot-pig.png"
           width={60}
           height={60}
           alt=""

@@ -40,7 +40,7 @@ export default function LectureCardsScreen({ title, cards, onBack, onDone }: Pro
 
         <div className="lcHeroRight">
           <div className="lcPercentPill">{percent}%</div>
-          <img className="lcHeroPig" src="/img/lectures/pig-bubbles.png" alt="" />
+          <img className="lcHeroPig" src="/img/home/ic-lectures.png" alt="" />
         </div>
 
         <img className="lcBubble b1" src="/img/home/bubble.png" alt="" />

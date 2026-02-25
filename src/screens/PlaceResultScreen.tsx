@@ -154,8 +154,8 @@ export default function PlaceResultScreen({
           src={result.img}
           alt=""
           style={{
-            width: 118,
-            height: 118,
+            width: 250,
+            height: 350,
             objectFit: 'contain',
             display: 'block',
             margin: '2px auto 0',

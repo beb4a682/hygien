@@ -92,7 +92,7 @@ export default function TestsSpisocScreen({ lectures, tests, onGoLectures, onOpe
               <Card className={`testItem ${open ? '' : 'locked'} soft`}>
                 {/* LEFT ICON */}
                 <div className="testItemMedia" aria-hidden="true">
-                  <img src={(t as any).icon ?? '/img/tests/default.png'} alt="" />
+                  <img src={(t as any).icon ?? '/img/home/ic-tests.png'} alt="" />
                 </div>
 
                 {/* RIGHT CONTENT */}
